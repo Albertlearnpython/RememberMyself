@@ -61,7 +61,6 @@
 | `file_size` | 文件大小 | number | 否 | 是 | 系统 |
 | `mime_type` | 文件格式 | string | 否 | 是 | 系统 |
 | `storage_key` | 存储路径 | string | 是 | 否 | 系统 |
-| `reader_enabled` | 是否允许在线阅读 | boolean | 是 | 否 | editor+ |
 | `download_enabled` | 是否允许下载 | boolean | 是 | 否 | editor+ |
 | `visibility` | 文件可见性 | enum | 是 | 否 | owner/editor |
 | `created_at` | 上传时间 | datetime | 是 | 否 | 系统 |
@@ -161,8 +160,8 @@
 这一版字段已经足够支撑：
 
 - 公开书单展示
-- 登录后阅读/下载
+- 登录后下载受保护文件
 - 抽屉式新增与编辑
-- 后续扩展阅读时间线
+- 封面展示与书籍归档
 
 它适合作为第一版正式实现的数据字段基线。

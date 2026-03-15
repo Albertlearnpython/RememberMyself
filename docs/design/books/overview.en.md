@@ -63,7 +63,7 @@ flowchart TD
 flowchart LR
     A["Filter rail"] --> B["Book shelf list"]
     B --> C["Book detail panel"]
-    C --> D["Protected reader / download area"]
+    C --> D["Protected file / download area"]
 ```
 
 ## Desktop Prototype
@@ -82,7 +82,7 @@ flowchart LR
 |                    | - short note                                              |
 +--------------------+-----------------------------+-----------------------------+
 | Detail panel                                    | Protected file zone         |
-| - large cover                                   | - read in browser           |
+| - large cover                                   | - download original file    |
 | - title + author                                | - download                  |
 | - personal note                                 | - locked state if no login  |
 | - reading history                               |                             |
@@ -186,15 +186,15 @@ Editor state:
 - change visibility
 - delete file
 
-## Reading Experience
+## File Archive Experience
 
-The in-browser reader should not feel bolted on.
+The file area should feel like a protected archive drawer, not like a mini reader app.
 
-Recommended reading modes later:
+Recommended priorities:
 
-- PDF reader view
-- Markdown/text reader view
-- metadata side panel
+- download the original file directly
+- show file metadata clearly
+- preserve permission boundaries without making the UI hostile
 
 ## CRUD Experience
 

@@ -95,7 +95,7 @@ class Book(models.Model):
 
 class BookAsset(models.Model):
     class AssetType(models.TextChoices):
-        EBOOK = "ebook", "电子书"
+        EBOOK = "ebook", "书籍文件"
         NOTE = "note", "笔记附件"
         AUDIO = "audio", "音频"
         OTHER = "other", "其他"
@@ -120,7 +120,6 @@ class BookAsset(models.Model):
     file = models.FileField("文件", upload_to="books/assets/%Y/%m/%d/")
     file_name = models.CharField("文件名", max_length=255, blank=True)
     file_size = models.PositiveBigIntegerField("文件大小", default=0)
-    reader_enabled = models.BooleanField("允许在线阅读", default=True)
     download_enabled = models.BooleanField("允许下载", default=True)
     visibility = models.CharField(
         "可见性",
@@ -143,10 +142,6 @@ class BookAsset(models.Model):
     def file_extension(self):
         target = self.file_name or self.file.name
         return Path(target).suffix.lower()
-
-    @property
-    def is_epub(self):
-        return self.file_extension == ".epub"
 
     @property
     def mime_type(self):

@@ -37,11 +37,11 @@ They are for confirming page blocks, not final visual design.
 | - status                                         |
 | - quick actions                                  |
 |                                                  |
-| Right: Detail / reader                           |
+| Right: Detail / files                            |
 | - metadata                                       |
 | - notes                                          |
 | - download                                       |
-| - read in browser                                |
+| - file archive status                            |
 +--------------------------------------------------+
 ```
 

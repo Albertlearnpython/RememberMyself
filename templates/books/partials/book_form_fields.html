@@ -85,13 +85,13 @@
 <div class="drawer-section">
     <div class="drawer-section__header">
         <h3>受保护文件</h3>
-        <p>这里上传的文件会出现在书籍详情的文件区。</p>
+        <p>这里上传的文件会出现在书籍详情的附件区，用于归档和下载。</p>
     </div>
 
     <label class="field">
         <span class="field__label">{{ form.asset_file.label }}</span>
         {{ form.asset_file }}
-        <span class="field__hint">支持上传 `epub / pdf / txt / md / mobi / azw3`。</span>
+        <span class="field__hint">支持上传 `epub / pdf / txt / md / mobi / azw3` 等常见书籍文件。</span>
         {% for error in form.asset_file.errors %}<span class="field__error">{{ error }}</span>{% endfor %}
     </label>
 
@@ -106,9 +106,8 @@
             {{ form.asset_visibility }}
             {% for error in form.asset_visibility.errors %}<span class="field__error">{{ error }}</span>{% endfor %}
         </label>
-        <div class="field field--checks">
+        <div class="field">
             <span class="field__label">文件动作</span>
-            <label class="check">{{ form.reader_enabled }} 在线阅读</label>
             <label class="check">{{ form.download_enabled }} 允许下载</label>
         </div>
     </div>

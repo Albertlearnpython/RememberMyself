@@ -191,6 +191,37 @@ Move into the next design round:
 
 Completed for this round.
 
+## 2026-03-16 - Round 11
+
+### Request
+
+Reposition the Favorite Books module:
+
+- remove in-browser reading
+- keep upload, download, and editing
+- use the book cover as the main visual representation
+- keep account-based permission isolation
+- update the GitHub documentation at the same time
+
+### Decisions
+
+- The books module is narrowed from a mixed reader/library concept into a book archive
+- The in-browser reader page, scripts, and reader endpoints are removed
+- Uploaded files are kept only for archival storage and download
+- The detail panel still keeps cover, notes, reading timeline, and protected file actions
+- The documentation now describes archive/download behavior instead of a reader experience
+
+### Affected Pages
+
+- Books
+- File permissions
+- Books module implementation spec
+- Request history
+
+### Status
+
+Implemented and documented.
+
 ## 2026-03-16 - Round 6
 
 ### Request

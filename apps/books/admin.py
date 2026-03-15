@@ -30,9 +30,8 @@ class BookAssetAdmin(admin.ModelAdmin):
         "book",
         "asset_type",
         "visibility",
-        "reader_enabled",
         "download_enabled",
         "created_at",
     )
-    list_filter = ("asset_type", "visibility", "reader_enabled", "download_enabled")
+    list_filter = ("asset_type", "visibility", "download_enabled")
     search_fields = ("file_name", "book__title")

@@ -23,7 +23,6 @@ class BookEditorForm(forms.ModelForm):
         required=False,
         initial=BookAsset.Visibility.LOGIN_REQUIRED,
     )
-    reader_enabled = forms.BooleanField(label="允许在线阅读", required=False, initial=True)
     download_enabled = forms.BooleanField(label="允许下载", required=False, initial=True)
 
     class Meta:
@@ -106,7 +105,6 @@ class BookEditorForm(forms.ModelForm):
                 asset_type=self.cleaned_data.get("asset_type") or BookAsset.AssetType.EBOOK,
                 visibility=self.cleaned_data.get("asset_visibility")
                 or BookAsset.Visibility.LOGIN_REQUIRED,
-                reader_enabled=self.cleaned_data.get("reader_enabled", True),
                 download_enabled=self.cleaned_data.get("download_enabled", True),
             )
         return book

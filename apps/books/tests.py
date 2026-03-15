@@ -62,7 +62,7 @@ class BooksVisibilityTests(TestCase):
         self.assertContains(response, "新增书籍")
 
 
-class BookAssetReaderTests(TestCase):
+class BookAssetTests(TestCase):
     def setUp(self):
         self.temp_media_root = tempfile.mkdtemp()
         self.settings_override = override_settings(MEDIA_ROOT=self.temp_media_root)
@@ -71,18 +71,18 @@ class BookAssetReaderTests(TestCase):
         self.addCleanup(lambda: shutil.rmtree(self.temp_media_root, ignore_errors=True))
 
         self.staff = User.objects.create_user(
-            username="reader_admin",
+            username="asset_admin",
             password="pass123456",
             is_staff=True,
         )
         self.book = Book.objects.create(
-            title="EPUB 测试书",
+            title="资料归档测试书",
             status=Book.Status.READING,
             visibility=Book.Visibility.PUBLIC,
         )
 
     def test_create_book_with_epub_upload_creates_asset(self):
-        self.client.login(username="reader_admin", password="pass123456")
+        self.client.login(username="asset_admin", password="pass123456")
 
         response = self.client.post(
             reverse("books:create"),
@@ -105,7 +105,6 @@ class BookAssetReaderTests(TestCase):
                 "visibility": Book.Visibility.PUBLIC,
                 "asset_type": BookAsset.AssetType.EBOOK,
                 "asset_visibility": BookAsset.Visibility.LOGIN_REQUIRED,
-                "reader_enabled": "on",
                 "download_enabled": "on",
                 "asset_file": SimpleUploadedFile(
                     "sample.epub",
@@ -119,44 +118,42 @@ class BookAssetReaderTests(TestCase):
         self.assertEqual(BookAsset.objects.count(), 1)
         self.assertEqual(BookAsset.objects.first().file_extension, ".epub")
 
-    def test_epub_read_route_renders_reader_page(self):
-        self.client.login(username="reader_admin", password="pass123456")
+    def test_detail_page_only_shows_download_action_for_asset(self):
+        self.client.login(username="asset_admin", password="pass123456")
         asset = BookAsset.objects.create(
             book=self.book,
             asset_type=BookAsset.AssetType.EBOOK,
             visibility=BookAsset.Visibility.LOGIN_REQUIRED,
-            reader_enabled=True,
             download_enabled=True,
             file=SimpleUploadedFile(
-                "reader.epub",
+                "archive.epub",
                 b"fake epub bytes",
                 content_type="application/epub+zip",
             ),
         )
 
-        response = self.client.get(reverse("books:read_asset", args=[asset.pk]))
+        response = self.client.get(reverse("books:detail", args=[self.book.pk]))
 
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, "books/reader.html")
-        self.assertContains(response, reverse("books:stream_asset", args=[asset.pk]))
-        self.assertContains(response, "?v=")
+        self.assertContains(response, reverse("books:download_asset", args=[asset.pk]))
+        self.assertNotContains(response, "在线阅读")
 
-    def test_epub_stream_route_returns_epub_content_type(self):
-        self.client.login(username="reader_admin", password="pass123456")
+    def test_download_route_returns_attachment(self):
+        self.client.login(username="asset_admin", password="pass123456")
         asset = BookAsset.objects.create(
             book=self.book,
             asset_type=BookAsset.AssetType.EBOOK,
             visibility=BookAsset.Visibility.LOGIN_REQUIRED,
-            reader_enabled=True,
             download_enabled=True,
             file=SimpleUploadedFile(
-                "stream.epub",
+                "download.epub",
                 b"fake epub bytes",
                 content_type="application/epub+zip",
             ),
         )
 
-        response = self.client.get(reverse("books:stream_asset", args=[asset.pk]))
+        response = self.client.get(reverse("books:download_asset", args=[asset.pk]))
 
         self.assertEqual(response.status_code, 200)
         self.assertIn("application/epub+zip", response["Content-Type"])
+        self.assertIn("attachment", response["Content-Disposition"])

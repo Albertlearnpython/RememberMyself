@@ -7,7 +7,7 @@
     <div class="books-page__header">
         <div>
             <p class="section-label">收藏书籍</p>
-            <h1>私人阅览室</h1>
+            <h1>私人藏书室</h1>
         </div>
         <form method="get" class="books-search">
             <input
@@ -109,7 +109,7 @@
             {% else %}
                 <div class="empty-panel">
                     <h2>书架还没有内容</h2>
-                    <p>第一版已经接好了数据结构、详情区和登录态文件区，现在只差第一本书被放进来。</p>
+                    <p>第一版已经接好了封面展示、详情区和受保护文件区，现在只差第一本书被放进来。</p>
                     {% if can_edit %}
                         <a class="button button--primary" href="{% url 'books:index' %}?editor=create">加入第一本书</a>
                     {% endif %}
@@ -171,7 +171,7 @@
                     <div class="asset-panel__header">
                         <div>
                             <span class="section-label">受保护文件</span>
-                            <h3>阅读与下载</h3>
+                            <h3>书籍附件</h3>
                         </div>
                         {% if not request.user.is_authenticated %}
                             <a class="button button--secondary" href="{% url 'login' %}?next={{ request.get_full_path|urlencode }}">登录后访问</a>
@@ -186,17 +186,14 @@
                                         <p>{{ row.asset.get_asset_type_display }} · {{ row.asset.formatted_file_size }}</p>
                                     </div>
                                     <div class="asset-card__actions">
-                                        {% if request.user.is_authenticated and row.can_read %}
-                                            <a class="button button--secondary" href="{% url 'books:read_asset' row.asset.pk %}" target="_blank" rel="noopener">
-                                                {{ row.read_label }}
-                                            </a>
-                                        {% else %}
-                                            <span class="meta-pill">阅读需登录</span>
-                                        {% endif %}
                                         {% if request.user.is_authenticated and row.can_download %}
                                             <a class="button button--secondary" href="{% url 'books:download_asset' row.asset.pk %}">
-                                                下载
+                                                下载文件
                                             </a>
+                                        {% elif not request.user.is_authenticated %}
+                                            <span class="meta-pill">登录后下载</span>
+                                        {% else %}
+                                            <span class="meta-pill">当前权限不可下载</span>
                                         {% endif %}
                                         {% if can_edit %}
                                             <form method="post" action="{% url 'books:delete_asset' row.asset.pk %}">
@@ -209,7 +206,7 @@
                             {% endfor %}
                         </div>
                     {% else %}
-                        <p class="muted-copy">这本书还没有挂载文件。以后可以上传电子书、笔记附件或其他资料。</p>
+                        <p class="muted-copy">这本书还没有挂载文件。以后可以上传书籍文件、笔记附件或其他资料。</p>
                     {% endif %}
                 </section>
 
@@ -222,7 +219,7 @@
             {% else %}
                 <div class="empty-panel">
                     <h2>详情区会停在这里</h2>
-                    <p>选中左侧书卡后，右边会显示完整信息、长笔记和受保护文件操作。</p>
+                    <p>选中左侧书卡后，右边会显示完整信息、长笔记、封面和受保护文件操作。</p>
                 </div>
             {% endif %}
         </aside>

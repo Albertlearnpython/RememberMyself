@@ -15,8 +15,7 @@ BooksPage
 │  └─ BookCard
 ├─ BookDetailPanel
 ├─ ProtectedAssetPanel
-├─ BookEditorDrawer
-└─ ReaderOverlay
+└─ BookEditorDrawer
 ```
 
 ## 组件职责
@@ -29,9 +28,8 @@ BooksPage
 | `BooksListSection` | 书籍列表与空态 | `items`, `selectedId` |
 | `BookCard` | 单本书摘要 | `book` |
 | `BookDetailPanel` | 详情信息与笔记 | `book` |
-| `ProtectedAssetPanel` | 阅读/下载权限门 | `assets`, `session` |
+| `ProtectedAssetPanel` | 文件归档与下载权限门 | `assets`, `session` |
 | `BookEditorDrawer` | 新增/编辑书籍 | `mode`, `initialValue` |
-| `ReaderOverlay` | 在线阅读 | `readerUrl`, `open` |
 
 ## 接口草案
 
@@ -44,7 +42,6 @@ BooksPage
 | `DELETE` | `/api/books/:id` | 删除书籍 |
 | `POST` | `/api/books/:id/assets` | 上传资源文件 |
 | `GET` | `/api/books/:id/assets` | 获取资源列表 |
-| `POST` | `/api/books/:id/reader-session` | 获取阅读会话 URL |
 
 ## 状态机
 
@@ -135,7 +132,6 @@ stateDiagram-v2
         "fileName": "meditations.epub",
         "assetType": "ebook",
         "fileSizeLabel": "1.4 MB",
-        "readerEnabled": true,
         "downloadEnabled": true,
         "visibility": "login_required"
       }
@@ -149,8 +145,7 @@ stateDiagram-v2
 | `whyItMatters` | `string` | `它帮人把情绪从外部拉回内部。` | 详情页最需要突出显示的段落 |
 | `longNote` | `string` | `这里放较长的阅读笔记...` | 长笔记正文，前端按段落渲染 |
 | `visibility` | `string` | `public` | 决定书籍整体可见范围 |
-| `assets[].assetType` | `string` | `ebook` | 文件类型，控制图标和可阅读策略 |
-| `assets[].readerEnabled` | `boolean` | `true` | 是否允许在线阅读 |
+| `assets[].assetType` | `string` | `ebook` | 文件类型，控制图标和归档呈现 |
 | `assets[].downloadEnabled` | `boolean` | `true` | 是否允许直接下载 |
 | `assets[].visibility` | `string` | `login_required` | 资源自身的权限级别 |
 
@@ -187,7 +182,7 @@ stateDiagram-v2
     detailSelecting --> detailError
 
     detailReady --> assetLocked: 资源需要登录
-    detailReady --> assetReady: 资源可读
+    detailReady --> assetReady: 资源可下载
     detailReady --> drawerCreate: 点击新增
     detailReady --> drawerEdit: 点击编辑
 
@@ -198,8 +193,8 @@ stateDiagram-v2
     submitError --> drawerCreate
     submitError --> drawerEdit
 
-    assetReady --> readerOpening: 点击在线阅读
-    readerOpening --> detailReady
+    assetReady --> downloading: 点击下载
+    downloading --> detailReady
 
     pageError --> listLoading: 重试
     detailError --> detailSelecting: 重新选择

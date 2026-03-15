@@ -76,41 +76,6 @@ def delete_book(request, book_id):
 
 
 @login_required
-def read_asset(request, asset_id):
-    asset = _get_readable_asset_or_403(asset_id, request.user)
-    if isinstance(asset, HttpResponseForbidden):
-        return asset
-    if asset.is_epub:
-        context = {
-            "page_title": f"在线阅读 · {asset.book.title}",
-            "book": asset.book,
-            "asset": asset,
-            "stream_url": reverse("books:stream_asset", kwargs={"asset_id": asset.pk}),
-        }
-        return render(request, "books/reader.html", context)
-
-    return FileResponse(
-        asset.file.open("rb"),
-        content_type=asset.mime_type,
-        as_attachment=False,
-        filename=asset.file_name,
-    )
-
-
-@login_required
-def stream_asset(request, asset_id):
-    asset = _get_readable_asset_or_403(asset_id, request.user)
-    if isinstance(asset, HttpResponseForbidden):
-        return asset
-    return FileResponse(
-        asset.file.open("rb"),
-        content_type=asset.mime_type,
-        as_attachment=False,
-        filename=asset.file_name,
-    )
-
-
-@login_required
 def download_asset(request, asset_id):
     asset = get_object_or_404(BookAsset.objects.select_related("book"), pk=asset_id)
     if (
@@ -196,13 +161,9 @@ def _render_books_page(request, selected_id=None, form=None, editor_mode=None):
             asset_rows.append(
                 {
                     "asset": asset,
-                    "can_read": request.user.is_authenticated
-                    and asset.reader_enabled
-                    and asset.can_access(request.user),
                     "can_download": request.user.is_authenticated
                     and asset.download_enabled
                     and asset.can_access(request.user),
-                    "read_label": "打开 EPUB 阅读器" if asset.is_epub else "在线阅读",
                 }
             )
 
@@ -237,13 +198,6 @@ def _user_can_edit(user):
     return getattr(user, "is_authenticated", False) and (
         getattr(user, "is_staff", False) or getattr(user, "is_superuser", False)
     )
-
-
-def _get_readable_asset_or_403(asset_id, user):
-    asset = get_object_or_404(BookAsset.objects.select_related("book"), pk=asset_id)
-    if not asset.reader_enabled or not asset.book.is_visible_to(user) or not asset.can_access(user):
-        return HttpResponseForbidden("当前账号无法在线阅读该文件。")
-    return asset
 
 
 def _require_editor(request):

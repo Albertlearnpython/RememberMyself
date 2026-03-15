@@ -10,7 +10,6 @@ from apps.core.site_data import SITE_TAGLINE, SITE_TITLE, get_site_modules
 STATIC_VERSION_FILES = (
     "site/styles.css",
     "site/app.js",
-    "site/epub-reader.js",
 )
 
 
