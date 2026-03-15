@@ -161,3 +161,32 @@ Refine the documentation system and continue the page design:
 ### Status
 
 Design deepening in progress.
+
+## 2026-03-16 - Round 5
+
+### Request
+
+Move into the next design round:
+
+- push the Home page closer to a formal UI specification
+- define the Favorite Books field structure
+- define the drawer-based create/edit form
+- define the mobile interaction flow and prototype
+- keep everything saved in GitHub
+
+### Decisions
+
+- A deeper Home layout composition spec is added
+- A Favorite Books field schema doc is added
+- A Favorite Books interaction and mobile-flow doc is added
+- The planning docs are now moving toward implementation-ready specifications
+
+### Affected Pages
+
+- Home
+- Books
+- Documentation index
+
+### Status
+
+Completed for this round.

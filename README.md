@@ -55,8 +55,11 @@
 - [文档总索引（中文）](./docs/README.zh-CN.md)
 - [首页设计概览（中文）](./docs/design/home/overview.zh-CN.md)
 - [首页高保真说明（中文）](./docs/design/home/visual-spec.zh-CN.md)
+- [首页版式深化说明（中文）](./docs/design/home/ui-composition.zh-CN.md)
 - [收藏书籍设计概览（中文）](./docs/design/books/overview.zh-CN.md)
 - [收藏书籍高保真说明（中文）](./docs/design/books/visual-spec.zh-CN.md)
+- [收藏书籍字段设计（中文）](./docs/design/books/data-fields.zh-CN.md)
+- [收藏书籍交互与手机端说明（中文）](./docs/design/books/interaction-flow.zh-CN.md)
 - [需求历史（中文）](./docs/history/request-history.zh-CN.md)
 
 英文/原始规划文档：
@@ -75,4 +78,5 @@
 - 已完成：总体架构规划
 - 已完成：首页与收藏书籍页的设计方向确定
 - 已完成：中文优先文档结构整理
-- 下一步：继续细化首页与收藏书籍页，再决定是否进入实际搭建
+- 已完成：首页版式深化、书籍字段设计与手机端交互设计
+- 下一步：继续细化视觉稿细节，或进入首批页面实际搭建

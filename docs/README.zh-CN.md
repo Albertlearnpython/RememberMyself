@@ -25,12 +25,15 @@ docs/
 
 - [首页设计概览（中文）](./design/home/overview.zh-CN.md)
 - [首页高保真说明（中文）](./design/home/visual-spec.zh-CN.md)
+- [首页版式深化说明（中文）](./design/home/ui-composition.zh-CN.md)
 - [Home Design Overview (English)](./design/home/overview.en.md)
 
 ### 收藏书籍
 
 - [收藏书籍设计概览（中文）](./design/books/overview.zh-CN.md)
 - [收藏书籍高保真说明（中文）](./design/books/visual-spec.zh-CN.md)
+- [收藏书籍字段设计（中文）](./design/books/data-fields.zh-CN.md)
+- [收藏书籍交互与手机端说明（中文）](./design/books/interaction-flow.zh-CN.md)
 - [Books Design Overview (English)](./design/books/overview.en.md)
 
 ## 2. 需求历史
@@ -55,4 +58,6 @@ docs/
 - 视觉基调是“简约 + 工艺美感 + 冷静的诗意”
 - 收藏书籍页采用抽屉式编辑
 - 收藏书籍页当前字段结构先保持现有方案
+- 首页继续深化到更接近正式 UI 的版式说明
+- 收藏书籍页已经补充字段设计和手机端交互方案
 - 文档以后统一按板块分类，不再平铺在根目录
