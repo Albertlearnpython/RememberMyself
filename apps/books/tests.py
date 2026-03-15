@@ -139,6 +139,7 @@ class BookAssetReaderTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "books/reader.html")
         self.assertContains(response, reverse("books:stream_asset", args=[asset.pk]))
+        self.assertContains(response, "?v=")
 
     def test_epub_stream_route_returns_epub_content_type(self):
         self.client.login(username="reader_admin", password="pass123456")

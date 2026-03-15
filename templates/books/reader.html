@@ -24,12 +24,12 @@
     <div class="reader-status" data-reader-status>正在加载 EPUB 阅读器…</div>
     <div class="reader-progress" data-reader-progress>0%</div>
     <div class="epub-viewer" data-reader-viewer></div>
-    <p class="reader-hint">如果当前章节没有立即出现，稍等几秒即可；首次打开 EPUB 会先解析目录和资源。</p>
+    <p class="reader-hint">如果这本书体积较大，首次打开可能需要几十秒到 1 分钟；进度条会持续更新，完成后会自动进入正文。</p>
 </section>
 {% endblock %}
 
 {% block extra_scripts %}
 <script src="{% static 'vendor/jszip.min.js' %}"></script>
 <script src="{% static 'vendor/epub.min.js' %}"></script>
-<script src="{% static 'site/epub-reader.js' %}"></script>
+<script src="{% static 'site/epub-reader.js' %}?v={{ site_asset_version }}"></script>
 {% endblock %}
