@@ -21,6 +21,8 @@ if (readerRoot) {
     };
 
     const formatPercent = (value) => `${Math.max(0, Math.min(100, Math.round(value)))}%`;
+    const setDownloadProgress = (message) => setProgress(`下载 ${message}`);
+    const setReadingProgress = (message) => setProgress(`阅读位置 ${message}`);
 
     const downloadBook = async () => {
         const response = await fetch(bookUrl, {
@@ -41,7 +43,7 @@ if (readerRoot) {
 
         if (!response.body) {
             const fallbackBuffer = await response.arrayBuffer();
-            setProgress("100%");
+            setDownloadProgress("100%");
             return fallbackBuffer;
         }
 
@@ -58,9 +60,9 @@ if (readerRoot) {
             chunks.push(value);
             received += value.length;
             if (total > 0) {
-                setProgress(formatPercent((received / total) * 100));
+                setDownloadProgress(formatPercent((received / total) * 100));
             } else {
-                setProgress(`${Math.round(received / 1024)} KB`);
+                setDownloadProgress(`${Math.round(received / 1024)} KB`);
             }
         }
 
@@ -71,7 +73,7 @@ if (readerRoot) {
             offset += chunk.length;
         }
         if (total > 0) {
-            setProgress("100%");
+            setDownloadProgress("100%");
         }
         return merged.buffer;
     };
@@ -83,7 +85,7 @@ if (readerRoot) {
         }
 
         setStatus("正在下载 EPUB 文件…");
-        setProgress("0%");
+        setDownloadProgress("0%");
 
         try {
             const bookBuffer = await downloadBook();
@@ -115,12 +117,13 @@ if (readerRoot) {
             rendition.on("relocated", (location) => {
                 const percentage = location?.start?.percentage;
                 if (typeof percentage === "number") {
-                    setProgress(formatPercent(percentage * 100));
+                    setReadingProgress(formatPercent(percentage * 100));
                 }
             });
 
             await rendition.display();
             setStatus("EPUB 已加载，可以开始阅读。");
+            setReadingProgress("0%");
 
             prevButton?.addEventListener("click", () => {
                 rendition.prev();
@@ -140,7 +143,7 @@ if (readerRoot) {
             });
         } catch (error) {
             setStatus(`EPUB 加载失败：${error.message || error}`);
-            setProgress("失败");
+            setProgress("读取失败");
         }
     };
 
