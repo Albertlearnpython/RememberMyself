@@ -91,16 +91,20 @@
     <label class="field">
         <span class="field__label">{{ form.asset_file.label }}</span>
         {{ form.asset_file }}
+        <span class="field__hint">支持上传 `epub / pdf / txt / md / mobi / azw3`。</span>
+        {% for error in form.asset_file.errors %}<span class="field__error">{{ error }}</span>{% endfor %}
     </label>
 
     <div class="drawer-grid drawer-grid--three">
         <label class="field">
             <span class="field__label">{{ form.asset_type.label }}</span>
             {{ form.asset_type }}
+            {% for error in form.asset_type.errors %}<span class="field__error">{{ error }}</span>{% endfor %}
         </label>
         <label class="field">
             <span class="field__label">{{ form.asset_visibility.label }}</span>
             {{ form.asset_visibility }}
+            {% for error in form.asset_visibility.errors %}<span class="field__error">{{ error }}</span>{% endfor %}
         </label>
         <div class="field field--checks">
             <span class="field__label">文件动作</span>

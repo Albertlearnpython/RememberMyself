@@ -11,6 +11,7 @@ urlpatterns = [
     path("<int:book_id>/edit/", views.edit_book, name="edit"),
     path("<int:book_id>/delete/", views.delete_book, name="delete"),
     path("asset/<int:asset_id>/read/", views.read_asset, name="read_asset"),
+    path("asset/<int:asset_id>/stream/", views.stream_asset, name="stream_asset"),
     path("asset/<int:asset_id>/download/", views.download_asset, name="download_asset"),
     path("asset/<int:asset_id>/delete/", views.delete_asset, name="delete_asset"),
 ]

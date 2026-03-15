@@ -188,7 +188,7 @@
                                     <div class="asset-card__actions">
                                         {% if request.user.is_authenticated and row.can_read %}
                                             <a class="button button--secondary" href="{% url 'books:read_asset' row.asset.pk %}" target="_blank" rel="noopener">
-                                                在线阅读
+                                                {{ row.read_label }}
                                             </a>
                                         {% else %}
                                             <span class="meta-pill">阅读需登录</span>

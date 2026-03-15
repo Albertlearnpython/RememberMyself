@@ -4,7 +4,13 @@ from apps.books.models import Book, BookAsset
 
 
 class BookEditorForm(forms.ModelForm):
-    asset_file = forms.FileField(label="上传文件", required=False)
+    asset_file = forms.FileField(
+        label="上传文件",
+        required=False,
+        widget=forms.ClearableFileInput(
+            attrs={"accept": ".epub,.pdf,.txt,.md,.mobi,.azw3"}
+        ),
+    )
     asset_type = forms.ChoiceField(
         label="文件类型",
         choices=BookAsset.AssetType.choices,
@@ -83,6 +89,12 @@ class BookEditorForm(forms.ModelForm):
         raw_tags = self.cleaned_data.get("tags", "")
         tags = [item.strip() for item in raw_tags.split(",") if item.strip()]
         return ", ".join(dict.fromkeys(tags))
+
+    def clean_asset_file(self):
+        asset_file = self.cleaned_data.get("asset_file")
+        if asset_file is not None and asset_file.size == 0:
+            raise forms.ValidationError("上传的文件为空。")
+        return asset_file
 
     def save(self, commit=True):
         book = super().save(commit=commit)

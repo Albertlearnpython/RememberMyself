@@ -1,7 +1,11 @@
 import os
+from pathlib import Path
+import mimetypes
 
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
+
+mimetypes.add_type("application/epub+zip", ".epub", strict=True)
 
 
 class BookQuerySet(models.QuerySet):
@@ -134,6 +138,20 @@ class BookAsset(models.Model):
 
     def __str__(self):
         return self.file_name or os.path.basename(self.file.name)
+
+    @property
+    def file_extension(self):
+        target = self.file_name or self.file.name
+        return Path(target).suffix.lower()
+
+    @property
+    def is_epub(self):
+        return self.file_extension == ".epub"
+
+    @property
+    def mime_type(self):
+        guessed_type = mimetypes.guess_type(self.file_name or self.file.name)[0]
+        return guessed_type or "application/octet-stream"
 
     def save(self, *args, **kwargs):
         if self.file:
