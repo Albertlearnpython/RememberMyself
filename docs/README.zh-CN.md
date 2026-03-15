@@ -54,9 +54,11 @@ docs/
 
 - [喜欢的音乐最终视觉稿说明（中文）](./design/music/final-visual-spec.zh-CN.md)
 
-### 其他板块初步说明
+### 其他板块
 
-- [其余板块初步设计总览（中文）](./design/all-modules/initial-overview.zh-CN.md)
+- [全站板块成熟度总览（中文）](./design/all-modules/initial-overview.zh-CN.md)
+- [健身养体最终视觉稿说明（中文）](./design/fitness/final-visual-spec.zh-CN.md)
+- [收支平衡最终视觉稿说明（中文）](./design/finance/final-visual-spec.zh-CN.md)
 - [喜欢的景色初步设计说明（中文）](./design/scenery/initial-spec.zh-CN.md)
 - [健身养体初步设计说明（中文）](./design/fitness/initial-spec.zh-CN.md)
 - [收支平衡初步设计说明（中文）](./design/finance/initial-spec.zh-CN.md)
@@ -90,5 +92,6 @@ docs/
 - 首页已经补足正式跳转规则和最终视觉规格
 - 收藏书籍页已经进入前端可直接照着实现的视觉规格层
 - 美食页与音乐页已经补到最终视觉稿层级
-- 其余板块已经建立第一版初步设计基线
+- 健身养体与收支平衡已经补到最终视觉稿层级
+- 景色、时间安排、方法心得仍处于初步设计阶段
 - 文档以后统一按板块分类，不再平铺在根目录

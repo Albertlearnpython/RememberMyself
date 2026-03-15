@@ -64,7 +64,9 @@
 - [收藏书籍最终视觉稿说明（中文）](./docs/design/books/final-visual-spec.zh-CN.md)
 - [喜欢的美食最终视觉稿说明（中文）](./docs/design/food/final-visual-spec.zh-CN.md)
 - [喜欢的音乐最终视觉稿说明（中文）](./docs/design/music/final-visual-spec.zh-CN.md)
-- [其余板块初步设计总览（中文）](./docs/design/all-modules/initial-overview.zh-CN.md)
+- [全站板块成熟度总览（中文）](./docs/design/all-modules/initial-overview.zh-CN.md)
+- [健身养体最终视觉稿说明（中文）](./docs/design/fitness/final-visual-spec.zh-CN.md)
+- [收支平衡最终视觉稿说明（中文）](./docs/design/finance/final-visual-spec.zh-CN.md)
 - [喜欢的景色初步设计说明（中文）](./docs/design/scenery/initial-spec.zh-CN.md)
 - [健身养体初步设计说明（中文）](./docs/design/fitness/initial-spec.zh-CN.md)
 - [收支平衡初步设计说明（中文）](./docs/design/finance/initial-spec.zh-CN.md)
@@ -91,4 +93,5 @@
 - 已完成：首页版式深化、书籍字段设计与手机端交互设计
 - 已完成：首页与收藏书籍页的最终视觉稿说明
 - 已完成：美食页与音乐页最终视觉稿，其他板块初步设计基线
-- 下一步：继续把景色/健身/收支/时间/方法逐步深化到最终视觉稿层级
+- 已完成：健身养体与收支平衡最终视觉稿说明
+- 下一步：继续把景色/时间安排/方法心得逐步深化到最终视觉稿层级

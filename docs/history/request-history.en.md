@@ -252,3 +252,32 @@ Expand the design work across the remaining modules:
 ### Status
 
 Completed for this round.
+
+## 2026-03-16 - Round 8
+
+### Request
+
+Continue refining the design work, with priority on:
+
+- Fitness
+- Finance
+
+The goal remains design-only, without implementation.
+
+### Decisions
+
+- A final visual spec is added for Fitness
+- A final visual spec is added for Finance
+- The module maturity overview is updated
+- The next suggested priorities are now Scenery, Methods, and Schedule
+
+### Affected Pages
+
+- Fitness
+- Finance
+- Documentation index
+- Module maturity overview
+
+### Status
+
+Completed for this round.
