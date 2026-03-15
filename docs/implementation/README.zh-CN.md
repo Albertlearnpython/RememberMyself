@@ -39,6 +39,13 @@ docs/implementation/
 - [时间安排模块实现说明（中文）](./modules/schedule-module-spec.zh-CN.md)
 - [方法心得模块实现说明（中文）](./modules/methods-module-spec.zh-CN.md)
 
+这些模块文档现在统一包含：
+
+- 组件树
+- 接口草案
+- 接口字段级示例
+- 页面状态细图
+
 ## 当前结论
 
 现在文档已经分成四层：
@@ -49,3 +56,9 @@ docs/implementation/
 4. `history`：需求演进记录
 
 这意味着后续真正开始开发时，不需要再从空白页起草方案。
+
+并且在 `implementation/modules/` 这一层，已经不只是“列一下接口名”，而是继续补到了：
+
+- 字段级返回示例
+- 页面局部状态流转
+- 不同组件之间的联动边界
