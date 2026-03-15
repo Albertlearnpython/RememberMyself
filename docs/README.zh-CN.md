@@ -26,6 +26,7 @@ docs/
 - [首页设计概览（中文）](./design/home/overview.zh-CN.md)
 - [首页高保真说明（中文）](./design/home/visual-spec.zh-CN.md)
 - [首页版式深化说明（中文）](./design/home/ui-composition.zh-CN.md)
+- [首页最终视觉稿说明（中文）](./design/home/final-visual-spec.zh-CN.md)
 - [Home Design Overview (English)](./design/home/overview.en.md)
 
 ### 收藏书籍
@@ -34,6 +35,7 @@ docs/
 - [收藏书籍高保真说明（中文）](./design/books/visual-spec.zh-CN.md)
 - [收藏书籍字段设计（中文）](./design/books/data-fields.zh-CN.md)
 - [收藏书籍交互与手机端说明（中文）](./design/books/interaction-flow.zh-CN.md)
+- [收藏书籍最终视觉稿说明（中文）](./design/books/final-visual-spec.zh-CN.md)
 - [Books Design Overview (English)](./design/books/overview.en.md)
 
 ## 2. 需求历史
@@ -60,4 +62,6 @@ docs/
 - 收藏书籍页当前字段结构先保持现有方案
 - 首页继续深化到更接近正式 UI 的版式说明
 - 收藏书籍页已经补充字段设计和手机端交互方案
+- 首页已经补足正式跳转规则和最终视觉规格
+- 收藏书籍页已经进入前端可直接照着实现的视觉规格层
 - 文档以后统一按板块分类，不再平铺在根目录

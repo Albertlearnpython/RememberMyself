@@ -190,3 +190,33 @@ Move into the next design round:
 ### Status
 
 Completed for this round.
+
+## 2026-03-16 - Round 6
+
+### Request
+
+Stay in the design phase and do not build yet.
+
+This round requires:
+
+- final visual specifications for Home and Favorite Books
+- enough detail on colors, weights, and card styles for direct frontend implementation
+- an explicit definition of how the Home page navigates to the other modules
+- save everything to GitHub
+
+### Decisions
+
+- A final visual specification doc is added for Home
+- A final visual specification doc is added for Favorite Books
+- Home now has explicit route, anchor, and click-navigation rules
+- Entry to other modules from Home is fixed as four layers: top bar, Hero, module index cards, and recent update cards
+
+### Affected Pages
+
+- Home
+- Books
+- Documentation index
+
+### Status
+
+Completed for this round.
