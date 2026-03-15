@@ -9,7 +9,8 @@ Recommendation for phase 1:
 - Charts: Chart.js or ECharts
 - Database: SQLite for local start, PostgreSQL for deployment growth
 - File storage: local media storage first, later object storage if needed
-- Auth: owner-only login for management
+- Auth: public read + authenticated edit
+- Permission layer: owner / editor / viewer-capable design
 
 This direction fits the current need because:
 
@@ -24,7 +25,9 @@ This direction fits the current need because:
 ```text
 RememberMyself/
   docs/
-  app/
+  apps/
+    core/
+    accounts/
     home/
     books/
     food/
@@ -59,12 +62,14 @@ Books:
 
 - support pdf, epub, txt, md upload first
 - browser reading priority: pdf, txt, md
+- download requires authenticated permission
 - epub can be added in phase 2
 
 Music:
 
 - support mp3, wav, m4a upload first
 - browser streaming playback
+- playback and download require authenticated permission
 
 Images:
 
@@ -81,6 +86,23 @@ Recommended editing mode:
 - create drawer or modal
 - edit drawer or modal
 - delete confirm
+
+## Auth and Permissions
+
+Recommended access model:
+
+- anonymous user: can view public page content
+- viewer: can access protected personal media such as books/music after login
+- editor: can create/update/delete normal content records
+- owner: full access including account/role management
+
+Recommended enforcement split:
+
+- page visibility policy
+- action policy
+- file access policy
+
+This is better than only a simple logged-in / not-logged-in split.
 
 ## Charts
 
@@ -99,6 +121,17 @@ Because the user wants each page independently adjustable:
 - templates should be page-based
 - services should be page-based
 - optional future versioning can use `v1`, `v2` page templates or feature flags per module
+- new modules should be addable as separate apps without rewriting existing ones
+
+## Visual Strategy
+
+The user wants independent visual style by page.
+
+Recommended rule:
+
+- keep shared shell small: navigation, auth, layout primitives
+- let each page own its own accent palette, spacing rhythm, media layout, and typography treatment
+- avoid over-centralizing UI rules that would block later redesign of one page
 
 ## Delivery Phases
 
@@ -129,8 +162,10 @@ These four are the strongest core identity modules.
 - methods
 - polish
 
-## Open Questions
+## Confirmed Decisions
 
-- Should the site be public-read / private-edit, or fully private?
-- Should uploaded books and music be only visible after login?
-- Do you want each module to have a different visual style, or keep one unified design language?
+- public-readable
+- authenticated editing
+- protected access for books and music
+- role layering needed
+- independent page style preferred

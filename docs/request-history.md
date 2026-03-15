@@ -57,3 +57,40 @@ Key themes extracted:
 ### Status
 
 In planning.
+
+## 2026-03-15 - Round 2
+
+### Request
+
+Continue discussing the design, not implementation yet.
+
+Additional confirmed requirements:
+
+- the site must be easy to extend with new pages later
+- diagrams should be visible both in GitHub docs and in chat discussion
+- page wireframes and data model design should be made explicit
+- the site should be public-readable
+- editing requires login
+- uploaded books and music also require login
+- account permissions should support layered roles
+- each page should be allowed to have its own visual style
+
+### Decisions
+
+- Architecture must optimize for future page/module expansion
+- Access policy is `public read + authenticated edit`
+- File policy for books and music is `authenticated access only`
+- Role model should support at least owner / editor / viewer separation
+- Visual system is page-independent, not globally forced into one style
+
+### Affected Pages
+
+- Global architecture
+- Auth and permission system
+- Books
+- Music
+- All page styling strategy
+
+### Status
+
+Planning updated.

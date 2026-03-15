@@ -27,6 +27,17 @@ flowchart TD
     A --> I["Methods and Insights"]
 ```
 
+## Expansion Principle
+
+The site must support future modules without structural pain.
+
+Recommended rule:
+
+- every new page is a new module
+- every module owns its route, data model, service layer, and UI assets
+- navigation is registry-based so a new page can be added by configuration, not by rewriting the whole site
+- protected media modules can define extra access rules independently
+
 ## Page Modules
 
 ### 1. Home
@@ -195,6 +206,18 @@ Recommended rule:
 - each page gets its own service layer
 - each page gets its own data model group
 - each page can later gain its own UI redesign without affecting the others
+
+## Access Rule
+
+Content visibility is split into two kinds:
+
+- public-readable modules and summaries
+- authenticated-only media/resources
+
+This means:
+
+- page content such as introductions, lists, notes, and public records can be public
+- uploaded books and music should require login before reading, downloading, or playing
 
 ## Security Boundary
 

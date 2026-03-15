@@ -45,6 +45,62 @@ They are for confirming page blocks, not final visual design.
 +--------------------------------------------------+
 ```
 
+## Favorite Food
+
+```text
++--------------------------------------------------+
+| Header + Add Dish                                |
++--------------------------------------------------+
+| Food card grid                                   |
+| - photo                                          |
+| - dish name                                      |
+| - short intro                                    |
+| - edit/delete                                    |
++--------------------------------------------------+
+| Detail drawer                                    |
+| - ingredient list                                |
+| - recipe text                                    |
+| - memory note                                    |
++--------------------------------------------------+
+```
+
+## Favorite Music
+
+```text
++--------------------------------------------------+
+| Header + Upload Track                            |
++--------------------------------------------------+
+| Music list                                       |
+| - cover                                          |
+| - title / artist                                 |
+| - play                                            |
+| - download                                        |
+| - edit/delete                                     |
++--------------------------------------------------+
+| Player area                                      |
+| - waveform or progress                           |
+| - note: why I like it                            |
++--------------------------------------------------+
+```
+
+## Favorite Scenery
+
+```text
++--------------------------------------------------+
+| Header + Add Place                               |
++--------------------------------------------------+
+| Photo wall / masonry                             |
+| - image                                          |
+| - title                                          |
+| - address                                        |
++--------------------------------------------------+
+| Detail panel                                     |
+| - gallery                                        |
+| - map/address                                    |
+| - visit note                                     |
++--------------------------------------------------+
+```
+
 ## Fitness and Body Care
 
 ```text
@@ -97,5 +153,22 @@ They are for confirming page blocks, not final visual design.
 | - updated date                                   |
 +--------------------------------------------------+
 | Markdown editor / preview                        |
++--------------------------------------------------+
+```
+
+## Time Arrangement
+
+```text
++--------------------------------------------------+
+| Date switch + Add plan                           |
++--------------------------------------------------+
+| Today's plan cards                               |
+| - task                                           |
+| - duration                                       |
+| - status                                         |
++--------------------------------------------------+
+| Weekly overview                                  |
+| - repeated routine                               |
+| - completion view                                |
 +--------------------------------------------------+
 ```
