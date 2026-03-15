@@ -13,7 +13,15 @@
 ```text
 docs/
 ├─ design/
+│  ├─ all-modules/
 │  ├─ home/
+│  ├─ food/
+│  ├─ music/
+│  ├─ scenery/
+│  ├─ fitness/
+│  ├─ finance/
+│  ├─ schedule/
+│  ├─ methods/
 │  └─ books/
 ├─ history/
 └─ planning/
@@ -37,6 +45,23 @@ docs/
 - [收藏书籍交互与手机端说明（中文）](./design/books/interaction-flow.zh-CN.md)
 - [收藏书籍最终视觉稿说明（中文）](./design/books/final-visual-spec.zh-CN.md)
 - [Books Design Overview (English)](./design/books/overview.en.md)
+
+### 喜欢的美食
+
+- [喜欢的美食最终视觉稿说明（中文）](./design/food/final-visual-spec.zh-CN.md)
+
+### 喜欢的音乐
+
+- [喜欢的音乐最终视觉稿说明（中文）](./design/music/final-visual-spec.zh-CN.md)
+
+### 其他板块初步说明
+
+- [其余板块初步设计总览（中文）](./design/all-modules/initial-overview.zh-CN.md)
+- [喜欢的景色初步设计说明（中文）](./design/scenery/initial-spec.zh-CN.md)
+- [健身养体初步设计说明（中文）](./design/fitness/initial-spec.zh-CN.md)
+- [收支平衡初步设计说明（中文）](./design/finance/initial-spec.zh-CN.md)
+- [时间安排初步设计说明（中文）](./design/schedule/initial-spec.zh-CN.md)
+- [方法心得初步设计说明（中文）](./design/methods/initial-spec.zh-CN.md)
 
 ## 2. 需求历史
 
@@ -64,4 +89,6 @@ docs/
 - 收藏书籍页已经补充字段设计和手机端交互方案
 - 首页已经补足正式跳转规则和最终视觉规格
 - 收藏书籍页已经进入前端可直接照着实现的视觉规格层
+- 美食页与音乐页已经补到最终视觉稿层级
+- 其余板块已经建立第一版初步设计基线
 - 文档以后统一按板块分类，不再平铺在根目录

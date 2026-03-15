@@ -62,6 +62,14 @@
 - [收藏书籍字段设计（中文）](./docs/design/books/data-fields.zh-CN.md)
 - [收藏书籍交互与手机端说明（中文）](./docs/design/books/interaction-flow.zh-CN.md)
 - [收藏书籍最终视觉稿说明（中文）](./docs/design/books/final-visual-spec.zh-CN.md)
+- [喜欢的美食最终视觉稿说明（中文）](./docs/design/food/final-visual-spec.zh-CN.md)
+- [喜欢的音乐最终视觉稿说明（中文）](./docs/design/music/final-visual-spec.zh-CN.md)
+- [其余板块初步设计总览（中文）](./docs/design/all-modules/initial-overview.zh-CN.md)
+- [喜欢的景色初步设计说明（中文）](./docs/design/scenery/initial-spec.zh-CN.md)
+- [健身养体初步设计说明（中文）](./docs/design/fitness/initial-spec.zh-CN.md)
+- [收支平衡初步设计说明（中文）](./docs/design/finance/initial-spec.zh-CN.md)
+- [时间安排初步设计说明（中文）](./docs/design/schedule/initial-spec.zh-CN.md)
+- [方法心得初步设计说明（中文）](./docs/design/methods/initial-spec.zh-CN.md)
 - [需求历史（中文）](./docs/history/request-history.zh-CN.md)
 
 英文/原始规划文档：
@@ -82,4 +90,5 @@
 - 已完成：中文优先文档结构整理
 - 已完成：首页版式深化、书籍字段设计与手机端交互设计
 - 已完成：首页与收藏书籍页的最终视觉稿说明
-- 下一步：继续补其他板块的视觉稿，或进入首批页面实际搭建
+- 已完成：美食页与音乐页最终视觉稿，其他板块初步设计基线
+- 下一步：继续把景色/健身/收支/时间/方法逐步深化到最终视觉稿层级
