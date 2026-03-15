@@ -1,52 +1,78 @@
 # RememberMyself
 
-`RememberMyself` is a personal life-system website project.
+`RememberMyself` 是一个“人生系统网站”项目。
 
-This repository is for planning first, implementation later.
+当前阶段仍然是规划优先，还没有开始正式开发。
 
-## Project Direction
+## 项目方向
 
-The site is not meant to be a generic blog. It is meant to be a structured personal system for:
+这个网站不是普通博客，也不是展示型主页。
 
-- remembering who I am
-- tracking what I love
-- preserving life records over time
-- turning habits, preferences, data, and reflections into a long-term archive
+它更像一个长期运作的个人系统，用来：
 
-## Core Principles
+- 记住我是谁
+- 保存我真正喜欢的东西
+- 记录身体、时间、收支和方法
+- 把数据、习惯、记忆和反思整理成可持续沉淀的个人档案
 
-- Personal first: the site should feel like a private personal operating system, not a public template site.
-- Modular pages: each page should be independently evolvable so later requests can change one module without breaking others.
-- Editable by page: each page should support focused iteration and version changes.
-- Data + narrative: records are not only lists and charts, but also memory and meaning.
-- Mobile-friendly: the site should work well on phone usage.
-- Security boundary: sensitive credentials and account secrets are not part of this website and must stay outside the repo and UI.
+## 当前设计基调
 
-## Planned Pages
+- 简约
+- 工艺美感
+- 冷静的诗意
+- 克制、精确、留白
 
-1. Home
-2. Favorite Books
-3. Favorite Food
-4. Favorite Music
-5. Favorite Scenery
-6. Fitness and Body Care
-7. Income and Expense Balance
-8. Time Arrangement
-9. Methods and Insights
+首页的核心口吻已经确定为：
 
-## Planning Docs
+> 首页不是“展示型官网”，而是“安静的总索引”。
 
-- [Site Blueprint](./docs/site-blueprint.md)
-- [Technical Plan](./docs/technical-plan.md)
-- [Page Wireframes](./docs/page-wireframes.md)
-- [Home Design](./docs/home-design.md)
-- [Books Design](./docs/books-design.md)
-- [Module Architecture](./docs/module-architecture.md)
-- [Data Models](./docs/data-models.md)
-- [Request History](./docs/request-history.md)
+## 核心原则
 
-## Current Stage
+- 模块独立：每个页面以后都应该可以独立扩展、改版、重构。
+- 公开阅读：网站内容可以公开浏览。
+- 登录编辑：编辑行为必须登录后才可见。
+- 资源保护：书籍和音乐等文件资源需要登录后访问。
+- 数据与叙事并存：页面既要能记录数据，也要能保存记忆与意义。
+- 敏感信息隔离：账号、密码、密钥等内容不进入网站和仓库。
+- 手机优先考虑：后续正式实现时要考虑手机使用体验。
 
-Stage: information architecture and technical planning.
+## 页面规划
 
-The actual website build has not started yet.
+1. 首页
+2. 收藏书籍
+3. 喜欢的美食
+4. 喜欢的音乐
+5. 喜欢的景色
+6. 健身养体
+7. 收支平衡
+8. 时间安排
+9. 方法心得
+
+## 文档导航
+
+中文优先入口：
+
+- [文档总索引（中文）](./docs/README.zh-CN.md)
+- [首页设计概览（中文）](./docs/design/home/overview.zh-CN.md)
+- [首页高保真说明（中文）](./docs/design/home/visual-spec.zh-CN.md)
+- [收藏书籍设计概览（中文）](./docs/design/books/overview.zh-CN.md)
+- [收藏书籍高保真说明（中文）](./docs/design/books/visual-spec.zh-CN.md)
+- [需求历史（中文）](./docs/history/request-history.zh-CN.md)
+
+英文/原始规划文档：
+
+- [Site Blueprint](./docs/planning/site-blueprint.en.md)
+- [Technical Plan](./docs/planning/technical-plan.en.md)
+- [Page Wireframes](./docs/planning/page-wireframes.en.md)
+- [Module Architecture](./docs/planning/module-architecture.en.md)
+- [Data Models](./docs/planning/data-models.en.md)
+- [Home Design Overview](./docs/design/home/overview.en.md)
+- [Books Design Overview](./docs/design/books/overview.en.md)
+- [Request History](./docs/history/request-history.en.md)
+
+## 当前状态
+
+- 已完成：总体架构规划
+- 已完成：首页与收藏书籍页的设计方向确定
+- 已完成：中文优先文档结构整理
+- 下一步：继续细化首页与收藏书籍页，再决定是否进入实际搭建

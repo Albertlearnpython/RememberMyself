@@ -10,7 +10,7 @@ It should feel like:
 - a crafted object
 - a long-term archive entrance
 
-The emotion is quiet confidence, not loud self-promotion.
+The emotion is quiet confidence with a restrained poetic undertone, not loud self-promotion.
 
 ## Visual Direction
 

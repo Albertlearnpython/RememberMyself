@@ -129,3 +129,35 @@ Still no implementation yet.
 ### Status
 
 Detailed page design in progress.
+
+## 2026-03-16 - Round 4
+
+### Request
+
+Refine the documentation system and continue the page design:
+
+- reorganize docs into clearer categories
+- provide Chinese versions and make Chinese the primary reading path
+- shape the home page tone into "cool poetic restraint"
+- use a drawer pattern for book-page editing
+- keep the current books data structure direction
+- continue with richer explanations and design diagrams
+
+### Decisions
+
+- Docs are reorganized into `planning / design / history`
+- Chinese-first docs are added as the primary entry point
+- The home page tone is refined to `calm, crafted, quietly poetic`
+- Favorite Books uses drawer-based create/edit interactions
+- The current books-page structure remains the baseline
+- High-fidelity design explanation docs are added for Home and Favorite Books
+
+### Affected Pages
+
+- Documentation system
+- Home
+- Books
+
+### Status
+
+Design deepening in progress.

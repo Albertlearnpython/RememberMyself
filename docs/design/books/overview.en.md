@@ -198,10 +198,10 @@ Recommended reading modes later:
 
 ## CRUD Experience
 
-Because you want page-level editing instead of only using a backend admin:
+Because you want page-level editing instead of only using a backend admin, the preferred pattern is a side drawer:
 
-- add book via modal or side drawer
-- edit book in same pattern
+- add book via side drawer
+- edit book in the same side drawer pattern
 - upload file as a secondary protected action
 
 This keeps the page elegant.
