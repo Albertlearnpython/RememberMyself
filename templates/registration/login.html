@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block body_class %}page page--auth{% endblock %}
+
+{% block content %}
+<section class="auth-card">
+    <div class="auth-card__intro">
+        <p class="section-label">登录</p>
+        <h1>进入编辑与受保护资源</h1>
+        <p>
+            当前版本使用 Django 账号体系。公开内容无需登录，
+            受保护文件需要登录，编辑权限默认交给 `staff` 或 `superuser` 账号。
+        </p>
+    </div>
+    <form method="post" class="auth-form">
+        {% csrf_token %}
+        {% if form.non_field_errors %}
+            <div class="form-errors">
+                {% for error in form.non_field_errors %}
+                    <p>{{ error }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+        <label class="field">
+            <span class="field__label">用户名</span>
+            {{ form.username }}
+        </label>
+        <label class="field">
+            <span class="field__label">密码</span>
+            {{ form.password }}
+        </label>
+        {% if next %}
+            <input type="hidden" name="next" value="{{ next }}">
+        {% endif %}
+        <button class="button button--primary" type="submit">登录</button>
+    </form>
+</section>
+{% endblock %}

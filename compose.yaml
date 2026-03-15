@@ -1,0 +1,16 @@
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: remembermyself-web
+    restart: unless-stopped
+    env_file:
+      - .env.production
+    ports:
+      - "${HOST_PORT:-8001}:8000"
+    volumes:
+      - remembermyself_data:/data
+
+volumes:
+  remembermyself_data:

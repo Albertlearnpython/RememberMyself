@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block body_class %}page page--home{% endblock %}
+
+{% block content %}
+<section class="home-hero">
+    <p class="section-label">{{ hero.eyebrow }}</p>
+    <h1>{{ hero.title }}</h1>
+    <p class="home-hero__body">{{ hero.body }}</p>
+    <div class="home-hero__actions">
+        <a class="button button--primary" href="{{ hero.primary_action.path }}">{{ hero.primary_action.label }}</a>
+        <a class="button button--secondary" href="{{ hero.secondary_action.path }}">{{ hero.secondary_action.label }}</a>
+    </div>
+</section>
+
+<section class="focus-section" id="current-focus">
+    <div class="section-heading">
+        <p class="section-label">当前关注</p>
+        <h2>首页不负责喧闹，只负责把重要的线索摆对位置。</h2>
+    </div>
+    <div class="focus-grid">
+        {% for item in focus_items %}
+            <a class="focus-card" href="{{ item.path }}">
+                <span class="focus-card__eyebrow">{{ item.eyebrow }}</span>
+                <strong>{{ item.title }}</strong>
+                <small>{{ item.meta }}</small>
+            </a>
+        {% endfor %}
+    </div>
+</section>
+
+<section class="module-index" id="module-index">
+    <div class="section-heading">
+        <p class="section-label">模块索引</p>
+        <h2>每一个页面都是独立板块，以后可以单独扩展、重写和继续生长。</h2>
+    </div>
+    <div class="module-grid">
+        {% for module in modules %}
+            <a class="module-card" href="{{ module.path }}">
+                <span class="module-card__status">{{ module.state }}</span>
+                <strong>{{ module.title }}</strong>
+                <p>{{ module.description }}</p>
+                <span class="module-card__enter">进入</span>
+            </a>
+        {% endfor %}
+    </div>
+</section>
+
+<section class="updates-section" id="recent-updates">
+    <div class="section-heading">
+        <p class="section-label">最近更新</p>
+        <h2>先让结构成立，再让内容慢慢长出来。</h2>
+    </div>
+    <div class="updates-grid">
+        {% for item in recent_updates %}
+            <a class="update-card" href="{{ item.path }}">
+                <span class="update-card__module">{{ item.module }}</span>
+                <p>{{ item.summary }}</p>
+                <small>{{ item.time }}</small>
+            </a>
+        {% endfor %}
+    </div>
+</section>
+
+<section class="archive-quote">
+    <blockquote>{{ archive_quote }}</blockquote>
+</section>
+{% endblock %}

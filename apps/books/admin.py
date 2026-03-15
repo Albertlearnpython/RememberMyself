@@ -1,0 +1,38 @@
+from django.contrib import admin
+
+from apps.books.models import Book, BookAsset
+
+
+class BookAssetInline(admin.TabularInline):
+    model = BookAsset
+    extra = 0
+
+
+@admin.register(Book)
+class BookAdmin(admin.ModelAdmin):
+    list_display = (
+        "title",
+        "author",
+        "status",
+        "visibility",
+        "rating",
+        "updated_at",
+    )
+    list_filter = ("status", "visibility", "created_at", "updated_at")
+    search_fields = ("title", "author", "publisher", "tags", "short_review")
+    inlines = [BookAssetInline]
+
+
+@admin.register(BookAsset)
+class BookAssetAdmin(admin.ModelAdmin):
+    list_display = (
+        "file_name",
+        "book",
+        "asset_type",
+        "visibility",
+        "reader_enabled",
+        "download_enabled",
+        "created_at",
+    )
+    list_filter = ("asset_type", "visibility", "reader_enabled", "download_enabled")
+    search_fields = ("file_name", "book__title")

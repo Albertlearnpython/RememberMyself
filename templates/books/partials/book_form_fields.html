@@ -1,0 +1,111 @@
+<div class="drawer-section">
+    <div class="drawer-grid drawer-grid--two">
+        <label class="field">
+            <span class="field__label">{{ form.title.label }}</span>
+            {{ form.title }}
+            {% for error in form.title.errors %}<span class="field__error">{{ error }}</span>{% endfor %}
+        </label>
+        <label class="field">
+            <span class="field__label">{{ form.subtitle.label }}</span>
+            {{ form.subtitle }}
+        </label>
+    </div>
+
+    <div class="drawer-grid drawer-grid--three">
+        <label class="field">
+            <span class="field__label">{{ form.author.label }}</span>
+            {{ form.author }}
+        </label>
+        <label class="field">
+            <span class="field__label">{{ form.translator.label }}</span>
+            {{ form.translator }}
+        </label>
+        <label class="field">
+            <span class="field__label">{{ form.publisher.label }}</span>
+            {{ form.publisher }}
+        </label>
+    </div>
+
+    <div class="drawer-grid drawer-grid--three">
+        <label class="field">
+            <span class="field__label">{{ form.publish_year.label }}</span>
+            {{ form.publish_year }}
+        </label>
+        <label class="field">
+            <span class="field__label">{{ form.status.label }}</span>
+            {{ form.status }}
+        </label>
+        <label class="field">
+            <span class="field__label">{{ form.rating.label }}</span>
+            {{ form.rating }}
+        </label>
+    </div>
+
+    <label class="field">
+        <span class="field__label">{{ form.cover_image_url.label }}</span>
+        {{ form.cover_image_url }}
+    </label>
+
+    <div class="drawer-grid drawer-grid--three">
+        <label class="field">
+            <span class="field__label">{{ form.tags.label }}</span>
+            {{ form.tags }}
+        </label>
+        <label class="field">
+            <span class="field__label">{{ form.reading_started_at.label }}</span>
+            {{ form.reading_started_at }}
+        </label>
+        <label class="field">
+            <span class="field__label">{{ form.reading_finished_at.label }}</span>
+            {{ form.reading_finished_at }}
+        </label>
+    </div>
+
+    <label class="field">
+        <span class="field__label">{{ form.short_review.label }}</span>
+        {{ form.short_review }}
+    </label>
+
+    <label class="field">
+        <span class="field__label">{{ form.why_it_matters.label }}</span>
+        {{ form.why_it_matters }}
+    </label>
+
+    <label class="field">
+        <span class="field__label">{{ form.long_note.label }}</span>
+        {{ form.long_note }}
+    </label>
+
+    <label class="field">
+        <span class="field__label">{{ form.visibility.label }}</span>
+        {{ form.visibility }}
+    </label>
+</div>
+
+<div class="drawer-section">
+    <div class="drawer-section__header">
+        <h3>受保护文件</h3>
+        <p>这里上传的文件会出现在书籍详情的文件区。</p>
+    </div>
+
+    <label class="field">
+        <span class="field__label">{{ form.asset_file.label }}</span>
+        {{ form.asset_file }}
+    </label>
+
+    <div class="drawer-grid drawer-grid--three">
+        <label class="field">
+            <span class="field__label">{{ form.asset_type.label }}</span>
+            {{ form.asset_type }}
+        </label>
+        <label class="field">
+            <span class="field__label">{{ form.asset_visibility.label }}</span>
+            {{ form.asset_visibility }}
+        </label>
+        <div class="field field--checks">
+            <span class="field__label">文件动作</span>
+            <label class="check">{{ form.reader_enabled }} 在线阅读</label>
+            <label class="check">{{ form.download_enabled }} 允许下载</label>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,71 @@
+{% load static %}
+<!doctype html>
+<html lang="zh-Hans">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}{{ page_title|default:site_title }} · {{ site_title }}{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'site/styles.css' %}">
+</head>
+<body class="{% block body_class %}{% endblock %}">
+    <div class="site-shell">
+        <header class="site-header">
+            <div class="site-header__inner">
+                <a class="site-brand" href="{% url 'home:index' %}">
+                    <span class="site-brand__title">{{ site_title }}</span>
+                    <span class="site-brand__tagline">{{ site_tagline }}</span>
+                </a>
+                <nav class="site-nav" aria-label="主导航">
+                    <button class="site-nav__button" type="button" data-panel-toggle aria-expanded="false">
+                        模块
+                    </button>
+                    <a class="site-nav__link" href="{% url 'home:index' %}#recent-updates">归档</a>
+                    {% if request.user.is_authenticated %}
+                        <span class="site-nav__link site-nav__link--muted">
+                            {{ request.user.username }}
+                        </span>
+                        <form action="{% url 'logout' %}" method="post" class="site-nav__form">
+                            {% csrf_token %}
+                            <button class="site-nav__button site-nav__button--ghost" type="submit">退出</button>
+                        </form>
+                    {% else %}
+                        <a class="site-nav__link" href="{% url 'login' %}?next={{ request.get_full_path|urlencode }}">登录</a>
+                    {% endif %}
+                </nav>
+            </div>
+            <div class="module-panel" data-panel hidden>
+                <div class="module-panel__inner">
+                    {% for module in site_modules %}
+                        <a class="module-panel__item" href="{{ module.path }}">
+                            <span>
+                                <strong>{{ module.title }}</strong>
+                                <small>{{ module.description }}</small>
+                            </span>
+                            <em>{{ module.state }}</em>
+                        </a>
+                    {% endfor %}
+                </div>
+            </div>
+        </header>
+
+        {% if messages %}
+            <div class="message-stack">
+                {% for message in messages %}
+                    <div class="message-stack__item message-stack__item--{{ message.tags|default:'info' }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <main class="site-main">
+            {% block content %}{% endblock %}
+        </main>
+
+        <footer class="site-footer">
+            <p>RememberMyself 不追求热闹，只整理真正重要的东西。</p>
+        </footer>
+    </div>
+    <script src="{% static 'site/app.js' %}"></script>
+</body>
+</html>

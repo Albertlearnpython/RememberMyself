@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block body_class %}page page--placeholder{% endblock %}
+
+{% block content %}
+<section class="placeholder-page">
+    <p class="section-label">{{ module.state }}</p>
+    <h1>{{ module.title }}</h1>
+    <p class="placeholder-page__lead">{{ module.description }}</p>
+    <div class="placeholder-page__panel">
+        <p>
+            这个板块已经保留好独立入口，后续可以直接扩展成正式页面，
+            不需要推翻首页与其他模块的结构。
+        </p>
+        <div class="placeholder-page__actions">
+            <a class="button button--primary" href="{% url 'home:index' %}">回到首页</a>
+            <a class="button button--secondary" href="{% url 'books:index' %}">查看收藏书籍页</a>
+        </div>
+    </div>
+</section>
+{% endblock %}

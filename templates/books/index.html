@@ -1,0 +1,270 @@
+{% extends "base.html" %}
+
+{% block body_class %}page page--books{% endblock %}
+
+{% block content %}
+<section class="books-page">
+    <div class="books-page__header">
+        <div>
+            <p class="section-label">收藏书籍</p>
+            <h1>私人阅览室</h1>
+        </div>
+        <form method="get" class="books-search">
+            <input
+                type="search"
+                name="q"
+                value="{{ active_filters.q }}"
+                placeholder="搜索书名、作者、标签或笔记"
+            >
+            {% if active_filters.status %}
+                <input type="hidden" name="status" value="{{ active_filters.status }}">
+            {% endif %}
+            {% if active_filters.tag %}
+                <input type="hidden" name="tag" value="{{ active_filters.tag }}">
+            {% endif %}
+            <button class="button button--secondary" type="submit">搜索</button>
+        </form>
+        {% if can_edit %}
+            <a class="button button--primary" href="{% url 'books:index' %}?editor=create">新增书籍</a>
+        {% endif %}
+    </div>
+
+    <div class="books-layout">
+        <aside class="books-filters">
+            <div class="filter-group">
+                <p class="filter-group__title">状态</p>
+                <a class="filter-chip {% if not active_filters.status %}is-active{% endif %}" href="{% url 'books:index' %}">
+                    全部
+                </a>
+                {% for value, label in status_filters %}
+                    <a
+                        class="filter-chip {% if active_filters.status == value %}is-active{% endif %}"
+                        href="{% url 'books:index' %}?status={{ value }}"
+                    >
+                        {{ label }}
+                    </a>
+                {% endfor %}
+            </div>
+
+            <div class="filter-group">
+                <p class="filter-group__title">标签</p>
+                <a class="filter-chip {% if not active_filters.tag %}is-active{% endif %}" href="{% url 'books:index' %}">
+                    全部标签
+                </a>
+                {% for tag in available_tags %}
+                    <a
+                        class="filter-chip {% if active_filters.tag == tag %}is-active{% endif %}"
+                        href="{% url 'books:index' %}?tag={{ tag|urlencode }}"
+                    >
+                        {{ tag }}
+                    </a>
+                {% empty %}
+                    <p class="muted-copy">等第一批书籍加入后，这里会自动长出标签。</p>
+                {% endfor %}
+            </div>
+        </aside>
+
+        <section class="books-list">
+            {% if books %}
+                {% for book in books %}
+                    <a
+                        class="book-card {% if selected_book and selected_book.pk == book.pk %}is-selected{% endif %}"
+                        href="{% url 'books:detail' book.pk %}{{ filter_query }}"
+                    >
+                        <div class="book-card__cover">
+                            {% if book.cover_image_url %}
+                                <img src="{{ book.cover_image_url }}" alt="{{ book.title }} 封面">
+                            {% else %}
+                                <span>{{ book.title|slice:":1" }}</span>
+                            {% endif %}
+                        </div>
+                        <div class="book-card__body">
+                            <div class="book-card__meta">
+                                <strong>{{ book.title }}</strong>
+                                {% if book.subtitle %}<small>{{ book.subtitle }}</small>{% endif %}
+                            </div>
+                            <p class="book-card__author">
+                                {% if book.author %}{{ book.author }}{% else %}作者待补充{% endif %}
+                            </p>
+                            <div class="book-card__chips">
+                                <span class="status-pill status-pill--{{ book.status }}">{{ book.get_status_display }}</span>
+                                {% for tag in book.tag_list|slice:":3" %}
+                                    <span class="meta-pill">{{ tag }}</span>
+                                {% endfor %}
+                            </div>
+                            <p class="book-card__summary">
+                                {% if book.short_review %}
+                                    {{ book.short_review }}
+                                {% else %}
+                                    这本书的短评还没有写下，但它已经进入了目录。
+                                {% endif %}
+                            </p>
+                        </div>
+                        <div class="book-card__aside">
+                            <small>{{ book.updated_at|date:"Y-m-d" }}</small>
+                            <span>查看</span>
+                        </div>
+                    </a>
+                {% endfor %}
+            {% else %}
+                <div class="empty-panel">
+                    <h2>书架还没有内容</h2>
+                    <p>第一版已经接好了数据结构、详情区和登录态文件区，现在只差第一本书被放进来。</p>
+                    {% if can_edit %}
+                        <a class="button button--primary" href="{% url 'books:index' %}?editor=create">加入第一本书</a>
+                    {% endif %}
+                </div>
+            {% endif %}
+        </section>
+
+        <aside class="book-detail">
+            {% if selected_book %}
+                <div class="book-detail__cover">
+                    {% if selected_book.cover_image_url %}
+                        <img src="{{ selected_book.cover_image_url }}" alt="{{ selected_book.title }} 封面">
+                    {% else %}
+                        <span>{{ selected_book.title|slice:":1" }}</span>
+                    {% endif %}
+                </div>
+
+                <div class="book-detail__header">
+                    <div>
+                        <h2>{{ selected_book.title }}</h2>
+                        {% if selected_book.subtitle %}<p>{{ selected_book.subtitle }}</p>{% endif %}
+                    </div>
+                    {% if can_edit %}
+                        <a class="button button--secondary" href="{% url 'books:detail' selected_book.pk %}?editor=edit">编辑</a>
+                    {% endif %}
+                </div>
+
+                <dl class="detail-meta">
+                    <div><dt>作者</dt><dd>{{ selected_book.author|default:"待补充" }}</dd></div>
+                    <div><dt>译者</dt><dd>{{ selected_book.translator|default:"-" }}</dd></div>
+                    <div><dt>出版</dt><dd>{{ selected_book.publisher|default:"-" }}{% if selected_book.publish_year %} · {{ selected_book.publish_year }}{% endif %}</dd></div>
+                    <div><dt>状态</dt><dd>{{ selected_book.get_status_display }}</dd></div>
+                    <div><dt>评分</dt><dd>{% if selected_book.rating %}{{ selected_book.rating }} / 5{% else %}-{% endif %}</dd></div>
+                    <div><dt>标签</dt><dd>{% if selected_book.tag_list %}{{ selected_book.tag_list|join:" · " }}{% else %}-{% endif %}</dd></div>
+                </dl>
+
+                <section class="note-panel note-panel--accent">
+                    <span class="section-label">为什么重要</span>
+                    <p>{{ selected_book.why_it_matters|default:"这部分还没写下。等你补上它为什么值得被记住。" }}</p>
+                </section>
+
+                <section class="note-panel">
+                    <span class="section-label">长笔记</span>
+                    <div class="rich-copy">
+                        {{ selected_book.long_note|default:"这里以后会放下更完整的阅读笔记、摘录和回想。"|linebreaks }}
+                    </div>
+                </section>
+
+                <section class="timeline-panel">
+                    <span class="section-label">阅读时间线</span>
+                    <p>
+                        {% if selected_book.reading_started_at %}开始：{{ selected_book.reading_started_at|date:"Y-m-d" }}{% else %}开始时间未记录{% endif %}
+                        <br>
+                        {% if selected_book.reading_finished_at %}完成：{{ selected_book.reading_finished_at|date:"Y-m-d" }}{% else %}完成时间未记录{% endif %}
+                    </p>
+                </section>
+
+                <section class="asset-panel">
+                    <div class="asset-panel__header">
+                        <div>
+                            <span class="section-label">受保护文件</span>
+                            <h3>阅读与下载</h3>
+                        </div>
+                        {% if not request.user.is_authenticated %}
+                            <a class="button button--secondary" href="{% url 'login' %}?next={{ request.get_full_path|urlencode }}">登录后访问</a>
+                        {% endif %}
+                    </div>
+                    {% if asset_rows %}
+                        <div class="asset-list">
+                            {% for row in asset_rows %}
+                                <article class="asset-card">
+                                    <div>
+                                        <strong>{{ row.asset.file_name }}</strong>
+                                        <p>{{ row.asset.get_asset_type_display }} · {{ row.asset.formatted_file_size }}</p>
+                                    </div>
+                                    <div class="asset-card__actions">
+                                        {% if request.user.is_authenticated and row.can_read %}
+                                            <a class="button button--secondary" href="{% url 'books:read_asset' row.asset.pk %}" target="_blank" rel="noopener">
+                                                在线阅读
+                                            </a>
+                                        {% else %}
+                                            <span class="meta-pill">阅读需登录</span>
+                                        {% endif %}
+                                        {% if request.user.is_authenticated and row.can_download %}
+                                            <a class="button button--secondary" href="{% url 'books:download_asset' row.asset.pk %}">
+                                                下载
+                                            </a>
+                                        {% endif %}
+                                        {% if can_edit %}
+                                            <form method="post" action="{% url 'books:delete_asset' row.asset.pk %}">
+                                                {% csrf_token %}
+                                                <button class="button button--danger" type="submit">删除文件</button>
+                                            </form>
+                                        {% endif %}
+                                    </div>
+                                </article>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="muted-copy">这本书还没有挂载文件。以后可以上传电子书、笔记附件或其他资料。</p>
+                    {% endif %}
+                </section>
+
+                {% if can_edit %}
+                    <form class="danger-form" method="post" action="{% url 'books:delete' selected_book.pk %}">
+                        {% csrf_token %}
+                        <button class="button button--danger" type="submit">删除这本书</button>
+                    </form>
+                {% endif %}
+            {% else %}
+                <div class="empty-panel">
+                    <h2>详情区会停在这里</h2>
+                    <p>选中左侧书卡后，右边会显示完整信息、长笔记和受保护文件操作。</p>
+                </div>
+            {% endif %}
+        </aside>
+    </div>
+</section>
+
+{% if editor_mode and form %}
+    <div class="drawer-backdrop">
+        <aside class="editor-drawer">
+            <div class="editor-drawer__header">
+                <div>
+                    <p class="section-label">编辑抽屉</p>
+                    <h2>{% if editor_mode == "edit" %}编辑书籍{% else %}新增书籍{% endif %}</h2>
+                </div>
+                <a class="button button--secondary" href="{% if selected_book %}{% url 'books:detail' selected_book.pk %}{% else %}{% url 'books:index' %}{% endif %}">关闭</a>
+            </div>
+
+            <form
+                method="post"
+                enctype="multipart/form-data"
+                class="editor-drawer__form"
+                action="{% if editor_mode == 'edit' and selected_book %}{% url 'books:edit' selected_book.pk %}{% else %}{% url 'books:create' %}{% endif %}"
+            >
+                {% csrf_token %}
+                <div class="editor-drawer__body">
+                    {% if form.non_field_errors %}
+                        <div class="form-errors">
+                            {% for error in form.non_field_errors %}
+                                <p>{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                    {% include "books/partials/book_form_fields.html" %}
+                </div>
+                <div class="editor-drawer__footer">
+                    <a class="button button--secondary" href="{% if selected_book %}{% url 'books:detail' selected_book.pk %}{% else %}{% url 'books:index' %}{% endif %}">
+                        取消
+                    </a>
+                    <button class="button button--primary" type="submit">保存</button>
+                </div>
+            </form>
+        </aside>
+    </div>
+{% endif %}
+{% endblock %}
