@@ -307,3 +307,31 @@ Finish the remaining modules as well.
 ### Status
 
 Completed for this round.
+
+## 2026-03-16 - Round 10
+
+### Request
+
+Continue with component-level implementation planning, including:
+
+- frontend component specifications
+- API drafts
+- state-machine descriptions
+- finer module-level implementation docs for each page
+
+### Decisions
+
+- A new `implementation` documentation layer is added
+- Shared implementation docs are added for frontend components, APIs, and state machines
+- Module implementation specs are added for all nine primary pages
+- The docs index is now structured as planning / design / implementation / history
+
+### Affected Pages
+
+- All nine primary pages
+- Documentation structure
+- Implementation planning layer
+
+### Status
+
+Completed for this round.

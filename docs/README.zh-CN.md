@@ -1,12 +1,13 @@
 # 文档总索引
 
-这个目录现在按“规划 / 设计 / 历史”三类整理。
+这个目录现在按“规划 / 设计 / 实现 / 历史”四类整理。
 
 优先阅读顺序建议如下：
 
 1. 先看页面设计
 2. 再看需求历史
-3. 最后看整体规划与技术方案
+3. 再看实现层文档
+4. 最后看整体规划与技术方案
 
 ## 目录结构
 
@@ -23,6 +24,9 @@ docs/
 │  ├─ schedule/
 │  ├─ methods/
 │  └─ books/
+├─ implementation/
+│  ├─ system/
+│  └─ modules/
 ├─ history/
 └─ planning/
 ```
@@ -73,7 +77,23 @@ docs/
 - [需求历史（中文）](./history/request-history.zh-CN.md)
 - [Request History (English)](./history/request-history.en.md)
 
-## 3. 整体规划
+## 3. 实现层
+
+- [实现层文档总索引（中文）](./implementation/README.zh-CN.md)
+- [前端组件规范（中文）](./implementation/system/frontend-component-spec.zh-CN.md)
+- [接口草案总规范（中文）](./implementation/system/api-draft.zh-CN.md)
+- [状态机总规范（中文）](./implementation/system/state-machine-conventions.zh-CN.md)
+- [首页模块实现说明（中文）](./implementation/modules/home-module-spec.zh-CN.md)
+- [收藏书籍模块实现说明（中文）](./implementation/modules/books-module-spec.zh-CN.md)
+- [喜欢的美食模块实现说明（中文）](./implementation/modules/food-module-spec.zh-CN.md)
+- [喜欢的音乐模块实现说明（中文）](./implementation/modules/music-module-spec.zh-CN.md)
+- [喜欢的景色模块实现说明（中文）](./implementation/modules/scenery-module-spec.zh-CN.md)
+- [健身养体模块实现说明（中文）](./implementation/modules/fitness-module-spec.zh-CN.md)
+- [收支平衡模块实现说明（中文）](./implementation/modules/finance-module-spec.zh-CN.md)
+- [时间安排模块实现说明（中文）](./implementation/modules/schedule-module-spec.zh-CN.md)
+- [方法心得模块实现说明（中文）](./implementation/modules/methods-module-spec.zh-CN.md)
+
+## 4. 整体规划
 
 目前这部分仍以英文版为主，后续再逐步补中文。
 
@@ -98,4 +118,5 @@ docs/
 - 健身养体与收支平衡已经补到最终视觉稿层级
 - 景色、时间安排、方法心得已经补到最终视觉稿层级
 - 九个主要板块都已完成最终视觉稿说明
+- 已新增实现层文档：组件规范、接口草案、状态机和九个模块实现说明
 - 文档以后统一按板块分类，不再平铺在根目录
