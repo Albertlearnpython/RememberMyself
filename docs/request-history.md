@@ -32,7 +32,7 @@ Key themes extracted:
 - body training and weight tracking
 - income and expense balance
 - time arrangement
-- methods and心得-style reflections
+- methods and insight-style reflections
 
 ### Decisions
 
@@ -94,3 +94,38 @@ Additional confirmed requirements:
 ### Status
 
 Planning updated.
+
+## 2026-03-15 - Round 3
+
+### Request
+
+Ignore all account/password content from the source article.
+
+Focus only on two page designs first:
+
+- Home
+- Favorite Books
+
+Design preference:
+
+- minimal
+- crafted
+- refined material feeling
+
+Still no implementation yet.
+
+### Decisions
+
+- Sensitive account/password content is fully excluded from the website scope
+- Home and Books become the first pages to receive detailed design treatment
+- Visual direction for this stage is `minimal + craftsmanship`
+
+### Affected Pages
+
+- Home
+- Books
+- Global visual system
+
+### Status
+
+Detailed page design in progress.

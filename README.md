@@ -39,6 +39,8 @@ The site is not meant to be a generic blog. It is meant to be a structured perso
 - [Site Blueprint](./docs/site-blueprint.md)
 - [Technical Plan](./docs/technical-plan.md)
 - [Page Wireframes](./docs/page-wireframes.md)
+- [Home Design](./docs/home-design.md)
+- [Books Design](./docs/books-design.md)
 - [Module Architecture](./docs/module-architecture.md)
 - [Data Models](./docs/data-models.md)
 - [Request History](./docs/request-history.md)
