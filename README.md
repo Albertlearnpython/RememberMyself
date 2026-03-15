@@ -67,6 +67,9 @@
 - [全站板块成熟度总览（中文）](./docs/design/all-modules/initial-overview.zh-CN.md)
 - [健身养体最终视觉稿说明（中文）](./docs/design/fitness/final-visual-spec.zh-CN.md)
 - [收支平衡最终视觉稿说明（中文）](./docs/design/finance/final-visual-spec.zh-CN.md)
+- [喜欢的景色最终视觉稿说明（中文）](./docs/design/scenery/final-visual-spec.zh-CN.md)
+- [时间安排最终视觉稿说明（中文）](./docs/design/schedule/final-visual-spec.zh-CN.md)
+- [方法心得最终视觉稿说明（中文）](./docs/design/methods/final-visual-spec.zh-CN.md)
 - [喜欢的景色初步设计说明（中文）](./docs/design/scenery/initial-spec.zh-CN.md)
 - [健身养体初步设计说明（中文）](./docs/design/fitness/initial-spec.zh-CN.md)
 - [收支平衡初步设计说明（中文）](./docs/design/finance/initial-spec.zh-CN.md)
@@ -92,6 +95,8 @@
 - 已完成：中文优先文档结构整理
 - 已完成：首页版式深化、书籍字段设计与手机端交互设计
 - 已完成：首页与收藏书籍页的最终视觉稿说明
-- 已完成：美食页与音乐页最终视觉稿，其他板块初步设计基线
+- 已完成：美食页与音乐页最终视觉稿说明
 - 已完成：健身养体与收支平衡最终视觉稿说明
-- 下一步：继续把景色/时间安排/方法心得逐步深化到最终视觉稿层级
+- 已完成：景色、时间安排、方法心得最终视觉稿说明
+- 已完成：九个主要板块全部进入最终视觉稿层级
+- 下一步：进入实际搭建，或继续补页面级组件实现说明

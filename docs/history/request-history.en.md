@@ -281,3 +281,29 @@ The goal remains design-only, without implementation.
 ### Status
 
 Completed for this round.
+
+## 2026-03-16 - Round 9
+
+### Request
+
+Finish the remaining modules as well.
+
+### Decisions
+
+- A final visual spec is added for Scenery
+- A final visual spec is added for Schedule
+- A final visual spec is added for Methods
+- All nine primary modules are now at the final-visual-spec level
+- The site-wide maturity overview and documentation index are updated
+
+### Affected Pages
+
+- Scenery
+- Schedule
+- Methods
+- Documentation index
+- Site-wide maturity overview
+
+### Status
+
+Completed for this round.
