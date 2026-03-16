@@ -11,11 +11,10 @@
 - 只覆盖你勾选的字段
 - 搜不到时只给轻提示，不打断当前页面
 
-本功能第一阶段支持三个来源：
+本功能当前版本支持两个来源：
 
 1. `微信读书`
 2. `豆瓣`
-3. `Open Library`
 
 它们在 UI 上统一抽象成一个“补全来源”下拉框。
 
@@ -69,7 +68,6 @@
 
 - `微信读书`
 - `豆瓣`
-- `Open Library`
 
 默认值建议：
 
@@ -185,7 +183,7 @@ flowchart TD
 
 字段说明：
 
-- `provider`：`weread | douban | openlibrary`
+- `provider`：`weread | douban`
 - `query`：可选，默认后端使用当前书籍标题；有需要时可传覆盖查询词
 
 返回示例：
@@ -379,7 +377,7 @@ flowchart TD
 
 ## 多来源选择规则
 
-三来源统一走同一套 UI 和接口结构。
+两来源统一走同一套 UI 和接口结构。
 
 ### 前端
 
@@ -393,15 +391,13 @@ flowchart TD
 
 - `weread`
 - `douban`
-- `openlibrary`
 
 建议内部实现为 provider adapter：
 
 ```text
 MetadataProvider
 ├─ WereadProvider
-├─ DoubanProvider
-└─ OpenLibraryProvider
+└─ DoubanProvider
 ```
 
 这样后面如果你要接：
@@ -436,13 +432,18 @@ MetadataProvider
 
 ## 第一版结论
 
-这套功能第一版应该是：
+这套功能当前落地版应该是：
 
 - 入口放编辑抽屉
-- 使用来源下拉框切换 `微信读书 / 豆瓣 / Open Library`
+- 使用来源下拉框切换 `微信读书 / 豆瓣`
 - 先调 `preview`
 - 弹字段差异预览
 - 再调 `apply`
 - 搜不到时只给 3 秒轻提示
+
+补充说明：
+
+- `Open Library` 在实际联调中持续超时，已经从当前可用来源中移除
+- `豆瓣` 的封面链接会在服务端统一归一为 `https`，避免出现有结果但图片无法直接使用的情况
 
 这样既安全，也不破坏当前书籍板块的结构。

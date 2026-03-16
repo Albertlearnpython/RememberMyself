@@ -14,18 +14,12 @@
             {% for error in form.title.errors %}<span class="field__error">{{ error }}</span>{% endfor %}
         </label>
 
-        <div class="drawer-grid drawer-grid--two">
-            <label class="field">
-                <span class="field__label">{{ form.subtitle.label }}</span>
-                {{ form.subtitle }}
-            </label>
-            <label class="field">
-                <span class="field__label">{{ form.cover_image_url.label }}</span>
-                {{ form.cover_image_url }}
-            </label>
-        </div>
+        <label class="field">
+            <span class="field__label">{{ form.subtitle.label }}</span>
+            {{ form.subtitle }}
+        </label>
 
-        <div class="drawer-grid drawer-grid--three">
+        <div class="drawer-grid drawer-grid--two">
             <label class="field">
                 <span class="field__label">{{ form.author.label }}</span>
                 {{ form.author }}
@@ -34,13 +28,19 @@
                 <span class="field__label">{{ form.translator.label }}</span>
                 {{ form.translator }}
             </label>
-            <label class="field">
-                <span class="field__label">{{ form.publisher.label }}</span>
-                {{ form.publisher }}
-            </label>
         </div>
 
-        <div class="drawer-grid drawer-grid--three">
+        <label class="field">
+            <span class="field__label">{{ form.publisher.label }}</span>
+            {{ form.publisher }}
+        </label>
+
+        <label class="field field--url">
+            <span class="field__label">{{ form.cover_image_url.label }}</span>
+            {{ form.cover_image_url }}
+        </label>
+
+        <div class="drawer-grid drawer-grid--two">
             <label class="field">
                 <span class="field__label">{{ form.publish_year.label }}</span>
                 {{ form.publish_year }}
@@ -49,26 +49,27 @@
                 <span class="field__label">{{ form.status.label }}</span>
                 {{ form.status }}
             </label>
+        </div>
+
+        <div class="drawer-grid drawer-grid--two">
             <label class="field">
                 <span class="field__label">{{ form.rating.label }}</span>
                 {{ form.rating }}
                 <span class="field__hint">改为 100 分制，留空表示暂未评分。</span>
                 {% for error in form.rating.errors %}<span class="field__error">{{ error }}</span>{% endfor %}
             </label>
-        </div>
-
-        <div class="drawer-grid drawer-grid--two">
             <label class="field">
                 <span class="field__label">{{ form.word_count.label }}</span>
                 {{ form.word_count }}
                 <span class="field__hint">单位是万字，支持小数，例如 8.5。</span>
                 {% for error in form.word_count.errors %}<span class="field__error">{{ error }}</span>{% endfor %}
             </label>
-            <label class="field">
-                <span class="field__label">{{ form.visibility.label }}</span>
-                {{ form.visibility }}
-            </label>
         </div>
+
+        <label class="field">
+            <span class="field__label">{{ form.visibility.label }}</span>
+            {{ form.visibility }}
+        </label>
 
         <label class="field">
             <span class="field__label">{{ form.short_review.label }}</span>
@@ -84,7 +85,7 @@
             </div>
         </div>
 
-        <div class="drawer-grid drawer-grid--two">
+        <div class="drawer-stack drawer-stack--tight">
             <div class="field field--tag-picker" data-tag-picker>
                 <div class="field__label-row">
                     <span class="field__label">{{ form.tag_links.label }}</span>
@@ -180,7 +181,7 @@
         {% for error in form.asset_file.errors %}<span class="field__error">{{ error }}</span>{% endfor %}
     </label>
 
-    <div class="drawer-grid drawer-grid--three">
+    <div class="drawer-grid drawer-grid--two">
         <label class="field">
             <span class="field__label">{{ form.asset_type.label }}</span>
             {{ form.asset_type }}
@@ -191,9 +192,10 @@
             {{ form.asset_visibility }}
             {% for error in form.asset_visibility.errors %}<span class="field__error">{{ error }}</span>{% endfor %}
         </label>
-        <div class="field">
-            <span class="field__label">文件动作</span>
-            <label class="check">{{ form.download_enabled }} 允许下载</label>
-        </div>
+    </div>
+
+    <div class="field field--check-card">
+        <span class="field__label">文件动作</span>
+        <label class="check">{{ form.download_enabled }} 允许下载</label>
     </div>
 </div>

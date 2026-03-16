@@ -18,7 +18,6 @@ PREVIEW_TOKEN_MAX_AGE = 600
 PROVIDER_LABELS = {
     "weread": "微信读书",
     "douban": "豆瓣",
-    "openlibrary": "Open Library",
 }
 
 ENRICHABLE_FIELDS = (
@@ -318,8 +317,6 @@ def _lookup_candidate(provider_id, query, book):
         return _lookup_weread(query, book)
     if provider_id == "douban":
         return _lookup_douban(query, book)
-    if provider_id == "openlibrary":
-        return _lookup_openlibrary(query, book)
     raise ValueError("unsupported provider")
 
 
@@ -345,46 +342,9 @@ def _lookup_weread(query, book):
                 author=_clean_whitespace(book_info.get("author") or ""),
                 translator=_clean_whitespace(book_info.get("translator") or ""),
                 publisher=_clean_whitespace(book_info.get("publisher") or ""),
-                cover_image_url=(book_info.get("cover") or "").strip(),
+                cover_image_url=_normalize_cover_image_url(book_info.get("cover") or ""),
                 intro=intro,
                 short_review=_build_short_review(title, book_info.get("author") or "", intro),
-            )
-        )
-    return _pick_best_candidate(candidates, query, book)
-
-
-def _lookup_openlibrary(query, book):
-    payload = _fetch_json(
-        f"https://openlibrary.org/search.json?title={quote(query)}&limit=6"
-    )
-    rows = payload.get("docs") or []
-    candidates = []
-    for row in rows:
-        title = _clean_whitespace(row.get("title") or "")
-        if not title:
-            continue
-        cover_i = row.get("cover_i")
-        cover_image_url = (
-            f"https://covers.openlibrary.org/b/id/{cover_i}-L.jpg"
-            if cover_i
-            else ""
-        )
-        author_names = row.get("author_name") or []
-        publisher_names = row.get("publisher") or []
-        subtitle = _clean_whitespace(row.get("subtitle") or "")
-        candidates.append(
-            MetadataCandidate(
-                source_id=str(row.get("key") or ""),
-                title=title,
-                subtitle=subtitle,
-                author=_clean_whitespace(author_names[0] if author_names else ""),
-                publisher=_clean_whitespace(publisher_names[0] if publisher_names else ""),
-                cover_image_url=cover_image_url,
-                short_review=_build_short_review(
-                    title,
-                    author_names[0] if author_names else "",
-                    "",
-                ),
             )
         )
     return _pick_best_candidate(candidates, query, book)
@@ -397,7 +357,7 @@ def _lookup_douban(query, book):
     matches = re.findall(
         (
             r'<div class="result">.*?<a class="nbg"[^>]*title="(?P<title>[^"]+)"[^>]*>'
-            r"\s*<img src=\"(?P<cover>[^\"]+)\".*?"
+            r'.*?<img[^>]+(?:data-src|src)="(?P<cover>[^"]+)".*?'
             r"<span class=\"subject-cast\">(?P<cast>.*?)</span>"
             r".*?<p>(?P<intro>.*?)</p>"
         ),
@@ -419,7 +379,7 @@ def _lookup_douban(query, book):
                 author=parsed["author"],
                 translator=parsed["translator"],
                 publisher=parsed["publisher"],
-                cover_image_url=_clean_whitespace(cover),
+                cover_image_url=_normalize_cover_image_url(cover),
                 intro=cleaned_intro,
                 short_review=_build_short_review(
                     cleaned_title,
@@ -556,6 +516,17 @@ def _fetch_text(url):
 
 def _normalize_text_value(value):
     return _clean_whitespace(str(value or ""))
+
+
+def _normalize_cover_image_url(value):
+    url = _clean_whitespace(value)
+    if not url:
+        return ""
+    if url.startswith("//"):
+        return f"https:{url}"
+    if url.startswith("http://"):
+        return f"https://{url[7:]}"
+    return url
 
 
 def _normalize_for_match(value):

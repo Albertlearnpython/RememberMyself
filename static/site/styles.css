@@ -448,6 +448,7 @@ button {
 .field {
     display: grid;
     gap: 8px;
+    min-width: 0;
 }
 
 .field__label {
@@ -484,7 +485,7 @@ button {
     color: #f7fbff;
 }
 
-.field input,
+.field input:not([type="checkbox"]):not([type="radio"]),
 .field textarea,
 .field select,
 .books-search input {
@@ -502,12 +503,24 @@ button {
     resize: vertical;
 }
 
+.field--url input {
+    font-family: var(--font-mono);
+    font-size: 13px;
+}
+
 .field--checks {
     align-content: start;
 }
 
 .field--tag-picker {
     align-content: start;
+}
+
+.field--check-card {
+    padding: 14px 16px;
+    border: 1px solid rgba(167, 180, 199, 0.14);
+    border-radius: 14px;
+    background: rgba(12, 22, 39, 0.62);
 }
 
 .tag-picker__toggle,
@@ -1113,12 +1126,12 @@ button {
 
 .drawer-section--form {
     display: grid;
-    gap: 24px;
+    gap: 26px;
 }
 
 .drawer-subsection {
     display: grid;
-    gap: 16px;
+    gap: 18px;
 }
 
 .drawer-subsection + .drawer-subsection {
@@ -1129,6 +1142,7 @@ button {
 .drawer-subsection__header {
     display: grid;
     gap: 6px;
+    max-width: 560px;
 }
 
 .drawer-subsection__header h4 {
@@ -1157,10 +1171,13 @@ button {
     gap: 14px;
 }
 
-.drawer-grid + .field,
-.drawer-section .field + .field,
-.drawer-grid + .drawer-grid {
-    margin-top: 14px;
+.drawer-stack {
+    display: grid;
+    gap: 14px;
+}
+
+.drawer-stack--tight {
+    gap: 16px;
 }
 
 .drawer-grid--two {

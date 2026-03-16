@@ -10,7 +10,7 @@ from django.test import TestCase
 from django.test.utils import override_settings
 from django.urls import reverse
 
-from apps.books.metadata import MetadataCandidate
+from apps.books.metadata import MetadataCandidate, _lookup_douban
 from apps.books.models import Book, BookAsset, BookTag
 
 
@@ -328,10 +328,8 @@ class BookMetadataApiTests(TestCase):
         self.assertEqual(payload["values"]["cover_image_url"], "https://example.com/cover.jpg")
         self.assertNotIn("author", payload["values"])
 
-    @patch("apps.books.metadata._lookup_candidate")
-    def test_preview_not_found_returns_status(self, lookup_candidate):
+    def test_preview_rejects_removed_provider(self):
         self.client.login(username="metadata_admin", password="pass123456")
-        lookup_candidate.return_value = None
 
         response = self.client.post(
             reverse("books:metadata_preview", args=[self.book.pk]),
@@ -339,10 +337,50 @@ class BookMetadataApiTests(TestCase):
             content_type="application/json",
         )
 
+        self.assertEqual(response.status_code, 400)
+        self.assertFalse(response.json()["success"])
+
+    @patch("apps.books.metadata._lookup_candidate")
+    def test_preview_not_found_returns_status(self, lookup_candidate):
+        self.client.login(username="metadata_admin", password="pass123456")
+        lookup_candidate.return_value = None
+
+        response = self.client.post(
+            reverse("books:metadata_preview", args=[self.book.pk]),
+            data=json.dumps({"provider": "douban"}),
+            content_type="application/json",
+        )
+
         self.assertEqual(response.status_code, 200)
         payload = response.json()
         self.assertEqual(payload["status"], "not_found")
-        self.assertEqual(payload["provider"]["id"], "openlibrary")
+        self.assertEqual(payload["provider"]["id"], "douban")
+
+
+class BookMetadataParsingTests(TestCase):
+    @patch("apps.books.metadata._fetch_text")
+    def test_douban_lookup_keeps_cover_when_image_uses_data_src(self, fetch_text):
+        fetch_text.return_value = """
+            <div class="result">
+                <div class="pic">
+                    <a class="nbg" title="苏菲的世界" onclick="moreurl(this,{ sid: 27172839, qcat: '1001'})">
+                        <img data-src="http://img9.doubanio.com/view/subject/s/public/s29580784.jpg">
+                    </a>
+                </div>
+                <div class="content">
+                    <span class="subject-cast">[挪威] 乔斯坦·贾德 / 萧宝森 / 作家出版社 / 2017</span>
+                    <p>这是一本风靡世界的哲学启蒙书。</p>
+                </div>
+            </div>
+        """
+
+        candidate = _lookup_douban("苏菲的世界", Book(title="苏菲的世界"))
+
+        self.assertIsNotNone(candidate)
+        self.assertEqual(
+            candidate.cover_image_url,
+            "https://img9.doubanio.com/view/subject/s/public/s29580784.jpg",
+        )
 
 
 class BookMetadataBatchApiTests(TestCase):
