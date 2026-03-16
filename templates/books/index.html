@@ -10,24 +10,29 @@
             <p class="section-label">收藏书籍</p>
             <h1>私人藏书室</h1>
         </div>
-        <form method="get" class="books-search">
-            <input
-                type="search"
-                name="q"
-                value="{{ active_filters.q }}"
-                placeholder="搜索书名、作者、标签或笔记"
-            >
-            {% if active_filters.status %}
-                <input type="hidden" name="status" value="{{ active_filters.status }}">
+        <div class="books-page__actions">
+            <form method="get" class="books-search">
+                <input
+                    type="search"
+                    name="q"
+                    value="{{ active_filters.q }}"
+                    placeholder="搜索书名、作者、标签或笔记"
+                >
+                {% if active_filters.status %}
+                    <input type="hidden" name="status" value="{{ active_filters.status }}">
+                {% endif %}
+                {% if active_filters.tag %}
+                    <input type="hidden" name="tag" value="{{ active_filters.tag }}">
+                {% endif %}
+                <button class="button button--secondary" type="submit">搜索</button>
+            </form>
+            {% if can_edit and books %}
+                <button class="button button--secondary" type="button" data-bulk-open>批量更新</button>
             {% endif %}
-            {% if active_filters.tag %}
-                <input type="hidden" name="tag" value="{{ active_filters.tag }}">
+            {% if can_edit %}
+                <a class="button button--primary" href="{% url 'books:index' %}?editor=create">新增书籍</a>
             {% endif %}
-            <button class="button button--secondary" type="submit">搜索</button>
-        </form>
-        {% if can_edit %}
-            <a class="button button--primary" href="{% url 'books:index' %}?editor=create">新增书籍</a>
-        {% endif %}
+        </div>
     </div>
 
     <div class="books-layout">
@@ -340,6 +345,122 @@
             <div class="metadata-modal__actions">
                 <button class="button button--secondary" type="button" data-metadata-modal-close>取消</button>
                 <button class="button button--primary" type="button" data-metadata-apply-trigger>确认填入</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div
+    class="bulk-metadata-modal"
+    data-bulk-metadata
+    data-bulk-url="{% url 'books:batch_metadata_update' %}"
+    hidden
+>
+    <div class="bulk-metadata-modal__backdrop" data-bulk-close></div>
+    <div class="bulk-metadata-modal__dialog" role="dialog" aria-modal="true" aria-labelledby="bulk-metadata-title">
+        <div class="bulk-metadata-modal__header">
+            <div>
+                <p class="section-label">批量补全</p>
+                <h2 id="bulk-metadata-title">批量更新某一个字段</h2>
+            </div>
+            <button class="button button--secondary" type="button" data-bulk-close>关闭</button>
+        </div>
+
+        <div class="bulk-metadata-modal__body">
+            <section class="bulk-panel">
+                <div class="bulk-panel__header">
+                    <h3>字段类型</h3>
+                    <p>一次只更新一种字段，避免批量覆盖过多内容。</p>
+                </div>
+                <div class="bulk-choice-grid">
+                    {% for field in metadata_batch_fields %}
+                        <label class="bulk-choice">
+                            <input
+                                type="radio"
+                                name="bulk-field"
+                                value="{{ field.id }}"
+                                data-bulk-field
+                                {% if forloop.first %}checked{% endif %}
+                            >
+                            <span>{{ field.label }}</span>
+                        </label>
+                    {% endfor %}
+                </div>
+            </section>
+
+            <section class="bulk-panel">
+                <div class="bulk-panel__header">
+                    <h3>补全来源</h3>
+                    <p>这里会按你选择的来源逐本查询，并直接写入数据库。</p>
+                </div>
+                <div class="bulk-choice-grid">
+                    {% for provider in metadata_providers %}
+                        <label class="bulk-choice">
+                            <input
+                                type="radio"
+                                name="bulk-provider"
+                                value="{{ provider.id }}"
+                                data-bulk-provider
+                                {% if forloop.first %}checked{% endif %}
+                            >
+                            <span>{{ provider.label }}</span>
+                        </label>
+                    {% endfor %}
+                </div>
+            </section>
+
+            <section class="bulk-panel">
+                <div class="bulk-panel__header">
+                    <h3>挑选书籍</h3>
+                    <p>支持先搜索再多选，只会处理你勾选的书。</p>
+                </div>
+                <div class="bulk-toolbar">
+                    <input
+                        class="bulk-toolbar__search"
+                        type="search"
+                        placeholder="搜索要批量更新的书籍"
+                        data-bulk-search
+                    >
+                    <button class="button button--secondary" type="button" data-bulk-select-all>全选可见</button>
+                    <button class="button button--secondary" type="button" data-bulk-clear>清空</button>
+                </div>
+                <div class="bulk-selection-summary" data-bulk-selection-summary>还未选择书籍</div>
+                <div class="bulk-book-list" data-bulk-book-list>
+                    {% for book in books %}
+                        <label
+                            class="bulk-book-choice"
+                            data-bulk-book-choice
+                            data-bulk-book-text="{{ book.title }} {{ book.author }} {{ book.publisher }}"
+                        >
+                            <input type="checkbox" value="{{ book.pk }}" data-bulk-book>
+                            <span class="bulk-book-choice__body">
+                                <strong>{{ book.title }}</strong>
+                                <small>
+                                    {% if book.author %}{{ book.author }}{% else %}作者待补充{% endif %}
+                                    {% if book.publisher %} · {{ book.publisher }}{% endif %}
+                                </small>
+                            </span>
+                        </label>
+                    {% empty %}
+                        <p class="muted-copy">当前没有可供批量更新的书籍。</p>
+                    {% endfor %}
+                </div>
+            </section>
+
+            <section class="bulk-panel bulk-results" data-bulk-results hidden>
+                <div class="bulk-panel__header">
+                    <h3>执行结果</h3>
+                    <p data-bulk-results-summary>这里会显示本次批量更新的汇总。</p>
+                </div>
+                <div class="bulk-result-list" data-bulk-result-list></div>
+            </section>
+        </div>
+
+        <div class="bulk-metadata-modal__footer">
+            <p class="bulk-metadata-modal__tip">只更新所选字段；外部结果为空、未命中或与当前相同的书，会自动跳过。</p>
+            <div class="bulk-metadata-modal__actions">
+                <button class="button button--secondary" type="button" data-bulk-close>取消</button>
+                <button class="button button--primary" type="button" data-bulk-submit>开始批量更新</button>
             </div>
         </div>
     </div>

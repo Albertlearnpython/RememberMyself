@@ -397,3 +397,216 @@ if (metadataRoot && metadataModal) {
         }
     });
 }
+
+const bulkMetadataModal = document.querySelector("[data-bulk-metadata]");
+
+if (bulkMetadataModal) {
+    const bulkOpenButtons = document.querySelectorAll("[data-bulk-open]");
+    const bulkCloseButtons = bulkMetadataModal.querySelectorAll("[data-bulk-close]");
+    const bulkSearchInput = bulkMetadataModal.querySelector("[data-bulk-search]");
+    const bulkSelectAllButton = bulkMetadataModal.querySelector("[data-bulk-select-all]");
+    const bulkClearButton = bulkMetadataModal.querySelector("[data-bulk-clear]");
+    const bulkSubmitButton = bulkMetadataModal.querySelector("[data-bulk-submit]");
+    const bulkSelectionSummary = bulkMetadataModal.querySelector("[data-bulk-selection-summary]");
+    const bulkBookChoices = Array.from(bulkMetadataModal.querySelectorAll("[data-bulk-book-choice]"));
+    const bulkBookInputs = bulkBookChoices
+        .map((choice) => choice.querySelector("[data-bulk-book]"))
+        .filter(Boolean);
+    const bulkResults = bulkMetadataModal.querySelector("[data-bulk-results]");
+    const bulkResultsSummary = bulkMetadataModal.querySelector("[data-bulk-results-summary]");
+    const bulkResultList = bulkMetadataModal.querySelector("[data-bulk-result-list]");
+    const bulkStatusLabels = {
+        updated: "已更新",
+        unchanged: "已跳过",
+        no_value: "无可用值",
+        not_found: "未命中",
+        unavailable: "暂不可用",
+    };
+    const csrfInput =
+        document.querySelector(".editor-drawer__form input[name='csrfmiddlewaretoken']")
+        || document.querySelector("input[name='csrfmiddlewaretoken']");
+    const defaultBulkSubmitLabel = "开始批量更新";
+
+    const requestJson = async (url, payload) => {
+        const response = await fetch(url, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": csrfInput?.value || "",
+                "X-Requested-With": "XMLHttpRequest",
+            },
+            body: JSON.stringify(payload),
+        });
+        const data = await response.json().catch(() => ({
+            success: false,
+            message: "请求失败，请稍后再试。",
+        }));
+        if (!response.ok) {
+            throw new Error(data.message || "请求失败，请稍后再试。");
+        }
+        return data;
+    };
+
+    const getSelectedBulkBookIds = () =>
+        bulkBookInputs.filter((input) => input.checked).map((input) => input.value);
+
+    const getVisibleBulkBookInputs = () =>
+        bulkBookInputs.filter((input) => !input.closest("[data-bulk-book-choice]")?.hidden);
+
+    const getSelectedBulkField = () =>
+        bulkMetadataModal.querySelector("[data-bulk-field]:checked")?.value || "";
+
+    const getSelectedBulkProvider = () =>
+        bulkMetadataModal.querySelector("[data-bulk-provider]:checked")?.value || "";
+
+    const openBulkModal = () => {
+        bulkMetadataModal.hidden = false;
+        document.body.classList.add("has-modal-open");
+    };
+
+    const closeBulkModal = () => {
+        bulkMetadataModal.hidden = true;
+        document.body.classList.remove("has-modal-open");
+    };
+
+    const updateBulkSubmitState = () => {
+        const selectedCount = getSelectedBulkBookIds().length;
+        if (!bulkSubmitButton) {
+            return;
+        }
+        bulkSubmitButton.disabled = false;
+        bulkSubmitButton.textContent =
+            selectedCount > 0
+                ? `${defaultBulkSubmitLabel}（${selectedCount}）`
+                : `${defaultBulkSubmitLabel}（先选书籍）`;
+        bulkSubmitButton.classList.toggle("button--muted", selectedCount === 0);
+        if (bulkSelectionSummary) {
+            bulkSelectionSummary.textContent =
+                selectedCount > 0
+                    ? `已选择 ${selectedCount} 本书，执行后会直接更新数据库。`
+                    : "还未选择书籍";
+        }
+    };
+
+    const filterBulkBooks = () => {
+        const keyword = bulkSearchInput?.value.trim().toLowerCase() || "";
+        bulkBookChoices.forEach((choice) => {
+            const haystack = (choice.dataset.bulkBookText || "").toLowerCase();
+            choice.hidden = Boolean(keyword) && !haystack.includes(keyword);
+        });
+    };
+
+    const renderBulkResults = (payload) => {
+        if (!bulkResults || !bulkResultsSummary || !bulkResultList) {
+            return;
+        }
+        const summary = payload.summary || {};
+        bulkResults.hidden = false;
+        bulkResultsSummary.textContent =
+            `共处理 ${summary.total || 0} 本，更新 ${summary.updated || 0} 本，`
+            + `跳过相同 ${summary.unchanged || 0} 本，未命中 ${summary.not_found || 0} 本，`
+            + `无值 ${summary.no_value || 0} 本，不可用 ${summary.unavailable || 0} 本。`;
+        bulkResultList.innerHTML = (payload.results || [])
+            .map(
+                (row) => `
+                    <article class="bulk-result-card">
+                        <div class="bulk-result-card__header">
+                            <strong>${escapeHtml(row.title || "未命名书籍")}</strong>
+                            <span class="bulk-status bulk-status--${escapeHtml(row.status || "idle")}">
+                                ${escapeHtml(bulkStatusLabels[row.status] || row.status || "未知")}
+                            </span>
+                        </div>
+                        <p>${escapeHtml(row.message || "")}</p>
+                    </article>
+                `,
+            )
+            .join("");
+    };
+
+    const setBulkLoading = (loading) => {
+        if (!bulkSubmitButton) {
+            return;
+        }
+        bulkSubmitButton.disabled = loading;
+        if (loading) {
+            bulkSubmitButton.textContent = "批量更新中…";
+            bulkSubmitButton.classList.remove("button--muted");
+            return;
+        }
+        updateBulkSubmitState();
+    };
+
+    bulkOpenButtons.forEach((button) => {
+        button.addEventListener("click", () => {
+            openBulkModal();
+            updateBulkSubmitState();
+        });
+    });
+
+    bulkCloseButtons.forEach((button) => {
+        button.addEventListener("click", closeBulkModal);
+    });
+
+    bulkSearchInput?.addEventListener("input", filterBulkBooks);
+
+    bulkSelectAllButton?.addEventListener("click", () => {
+        getVisibleBulkBookInputs().forEach((input) => {
+            input.checked = true;
+        });
+        updateBulkSubmitState();
+    });
+
+    bulkClearButton?.addEventListener("click", () => {
+        bulkBookInputs.forEach((input) => {
+            input.checked = false;
+        });
+        updateBulkSubmitState();
+    });
+
+    bulkBookInputs.forEach((input) => {
+        input.addEventListener("change", updateBulkSubmitState);
+    });
+
+    bulkSubmitButton?.addEventListener("click", async () => {
+        const bookIds = getSelectedBulkBookIds();
+        if (bookIds.length === 0) {
+            showToast("请先选择要批量更新的书籍。");
+            return;
+        }
+
+        setBulkLoading(true);
+        try {
+            const payload = await requestJson(bulkMetadataModal.dataset.bulkUrl, {
+                provider: getSelectedBulkProvider(),
+                field: getSelectedBulkField(),
+                bookIds,
+            });
+            renderBulkResults(payload);
+            showToast(payload.message || "批量更新已完成。", payload.summary?.updated ? "success" : "info");
+            if ((payload.summary?.updated || 0) > 0) {
+                window.setTimeout(() => {
+                    window.location.reload();
+                }, 1200);
+            }
+        } catch (error) {
+            showToast(error.message || "批量更新失败，请稍后再试。", "danger");
+        } finally {
+            setBulkLoading(false);
+        }
+    });
+
+    bulkMetadataModal.addEventListener("click", (event) => {
+        if (event.target === bulkMetadataModal) {
+            closeBulkModal();
+        }
+    });
+
+    document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape" && !bulkMetadataModal.hidden) {
+            closeBulkModal();
+        }
+    });
+
+    filterBulkBooks();
+    updateBulkSubmitState();
+}

@@ -18,7 +18,9 @@ from django.views.decorators.http import require_POST
 from apps.books.forms import BookEditorForm
 from apps.books.metadata import (
     apply_metadata_preview,
+    apply_bulk_metadata_field,
     build_metadata_preview,
+    get_metadata_batch_field_options,
     get_metadata_provider_options,
 )
 from apps.books.models import Book, BookAsset, BookTag
@@ -172,6 +174,52 @@ def metadata_apply(request, book_id):
     return JsonResponse(result, json_dumps_params={"ensure_ascii": False})
 
 
+@require_POST
+def batch_metadata_update(request):
+    permission_response = _require_editor(request)
+    if permission_response:
+        return permission_response
+
+    payload = _parse_json_body(request)
+    if payload is None:
+        return HttpResponseBadRequest("invalid json")
+
+    provider_id = (payload.get("provider") or "").strip()
+    field_name = (payload.get("field") or "").strip()
+    raw_book_ids = payload.get("bookIds") or []
+    book_ids = _normalize_book_ids(raw_book_ids)
+
+    if not book_ids:
+        return JsonResponse(
+            {"success": False, "message": "请至少选择一本要批量更新的书。"},
+            status=400,
+            json_dumps_params={"ensure_ascii": False},
+        )
+
+    book_map = {
+        book.pk: book
+        for book in Book.objects.visible_to_user(request.user).filter(pk__in=book_ids)
+    }
+    books = [book_map[book_id] for book_id in book_ids if book_id in book_map]
+    if not books:
+        return JsonResponse(
+            {"success": False, "message": "未找到可操作的书籍。"},
+            status=404,
+            json_dumps_params={"ensure_ascii": False},
+        )
+
+    try:
+        result = apply_bulk_metadata_field(books, provider_id, field_name)
+    except ValueError:
+        return JsonResponse(
+            {"success": False, "message": "批量补全参数无效，请重新选择。"},
+            status=400,
+            json_dumps_params={"ensure_ascii": False},
+        )
+
+    return JsonResponse(result, json_dumps_params={"ensure_ascii": False})
+
+
 def _render_books_page(request, selected_id=None, form=None, editor_mode=None):
     visible_books_qs = Book.objects.visible_to_user(request.user)
     books_qs = visible_books_qs
@@ -252,6 +300,7 @@ def _render_books_page(request, selected_id=None, form=None, editor_mode=None):
         "can_edit": can_edit,
         "filter_query": _build_query_string(q=q, status=status, tag=tag),
         "metadata_providers": get_metadata_provider_options(),
+        "metadata_batch_fields": get_metadata_batch_field_options(),
     }
     return render(request, "books/index.html", context)
 
@@ -284,6 +333,21 @@ def _parse_json_body(request):
         return json.loads(request.body.decode("utf-8") or "{}")
     except (UnicodeDecodeError, json.JSONDecodeError):
         return None
+
+
+def _normalize_book_ids(values):
+    normalized = []
+    seen = set()
+    for value in values:
+        try:
+            book_id = int(value)
+        except (TypeError, ValueError):
+            continue
+        if book_id in seen:
+            continue
+        seen.add(book_id)
+        normalized.append(book_id)
+    return normalized
 
 
 def _metadata_apply_error_message(error_code):

@@ -343,3 +343,111 @@ class BookMetadataApiTests(TestCase):
         payload = response.json()
         self.assertEqual(payload["status"], "not_found")
         self.assertEqual(payload["provider"]["id"], "openlibrary")
+
+
+class BookMetadataBatchApiTests(TestCase):
+    def setUp(self):
+        self.book_a = Book.objects.create(
+            title="Atomic Habits",
+            cover_image_url="",
+            status=Book.Status.READING,
+            visibility=Book.Visibility.PUBLIC,
+        )
+        self.book_b = Book.objects.create(
+            title="Deep Work",
+            cover_image_url="https://example.com/deep-work.jpg",
+            status=Book.Status.READING,
+            visibility=Book.Visibility.PUBLIC,
+        )
+        self.book_c = Book.objects.create(
+            title="Missing Book",
+            cover_image_url="",
+            status=Book.Status.PLANNED,
+            visibility=Book.Visibility.PUBLIC,
+        )
+        self.staff = User.objects.create_user(
+            username="batch_admin",
+            password="pass123456",
+            is_staff=True,
+        )
+
+    def test_batch_update_requires_editor_permission(self):
+        response = self.client.post(
+            reverse("books:batch_metadata_update"),
+            data=json.dumps(
+                {
+                    "provider": "weread",
+                    "field": "cover_image_url",
+                    "bookIds": [self.book_a.pk],
+                }
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, 302)
+        self.assertIn(reverse("login"), response.url)
+
+    @patch("apps.books.metadata._lookup_candidate")
+    def test_batch_update_updates_selected_field_and_returns_summary(self, lookup_candidate):
+        self.client.login(username="batch_admin", password="pass123456")
+
+        def fake_lookup(provider_id, query, book):
+            if book.pk == self.book_a.pk:
+                return MetadataCandidate(
+                    source_id="weread-a",
+                    title=book.title,
+                    cover_image_url="https://example.com/atomic-habits.jpg",
+                )
+            if book.pk == self.book_b.pk:
+                return MetadataCandidate(
+                    source_id="weread-b",
+                    title=book.title,
+                    cover_image_url="https://example.com/deep-work.jpg",
+                )
+            return None
+
+        lookup_candidate.side_effect = fake_lookup
+
+        response = self.client.post(
+            reverse("books:batch_metadata_update"),
+            data=json.dumps(
+                {
+                    "provider": "weread",
+                    "field": "cover_image_url",
+                    "bookIds": [self.book_a.pk, self.book_b.pk, self.book_c.pk],
+                }
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, 200)
+        payload = response.json()
+        self.assertEqual(payload["summary"]["total"], 3)
+        self.assertEqual(payload["summary"]["updated"], 1)
+        self.assertEqual(payload["summary"]["unchanged"], 1)
+        self.assertEqual(payload["summary"]["not_found"], 1)
+
+        self.book_a.refresh_from_db()
+        self.book_b.refresh_from_db()
+        self.book_c.refresh_from_db()
+        self.assertEqual(self.book_a.cover_image_url, "https://example.com/atomic-habits.jpg")
+        self.assertEqual(self.book_b.cover_image_url, "https://example.com/deep-work.jpg")
+        self.assertEqual(self.book_c.cover_image_url, "")
+
+    def test_batch_update_rejects_invalid_field(self):
+        self.client.login(username="batch_admin", password="pass123456")
+
+        response = self.client.post(
+            reverse("books:batch_metadata_update"),
+            data=json.dumps(
+                {
+                    "provider": "weread",
+                    "field": "rating",
+                    "bookIds": [self.book_a.pk],
+                }
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertFalse(response.json()["success"])

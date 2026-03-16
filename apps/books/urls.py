@@ -7,6 +7,7 @@ app_name = "books"
 urlpatterns = [
     path("", views.index, name="index"),
     path("create/", views.create_book, name="create"),
+    path("batch-metadata-update/", views.batch_metadata_update, name="batch_metadata_update"),
     path("<int:book_id>/", views.detail, name="detail"),
     path("<int:book_id>/edit/", views.edit_book, name="edit"),
     path("<int:book_id>/metadata-preview/", views.metadata_preview, name="metadata_preview"),

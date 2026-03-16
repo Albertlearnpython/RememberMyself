@@ -87,6 +87,13 @@ def get_metadata_provider_options():
     ]
 
 
+def get_metadata_batch_field_options():
+    return [
+        {"id": field_name, "label": FIELD_LABELS[field_name]}
+        for field_name in ENRICHABLE_FIELDS
+    ]
+
+
 def build_metadata_preview(book, provider_id, query=""):
     provider_label = PROVIDER_LABELS.get(provider_id)
     if provider_label is None:
@@ -186,6 +193,101 @@ def apply_metadata_preview(book, preview_token, field_names):
         "updatedFields": selected_fields,
         "values": values,
         "message": f"已将 {len(selected_fields)} 个字段填入当前表单，请继续点击保存。",
+    }
+
+
+def apply_bulk_metadata_field(books, provider_id, field_name):
+    provider_label = PROVIDER_LABELS.get(provider_id)
+    if provider_label is None:
+        raise ValueError("unsupported provider")
+    if field_name not in ENRICHABLE_FIELDS:
+        raise ValueError("unsupported field")
+
+    processed_books = list(books)
+    summary = {
+        "total": len(processed_books),
+        "updated": 0,
+        "unchanged": 0,
+        "not_found": 0,
+        "no_value": 0,
+        "unavailable": 0,
+    }
+    results = []
+
+    for book in processed_books:
+        try:
+            candidate = _lookup_candidate(provider_id, book.title, book)
+        except MetadataProviderUnavailable:
+            summary["unavailable"] += 1
+            results.append(
+                {
+                    "bookId": book.pk,
+                    "title": book.title,
+                    "status": "unavailable",
+                    "message": f"{provider_label} 当前暂时不可用。",
+                }
+            )
+            continue
+
+        if candidate is None:
+            summary["not_found"] += 1
+            results.append(
+                {
+                    "bookId": book.pk,
+                    "title": book.title,
+                    "status": "not_found",
+                    "message": "没有找到匹配结果。",
+                }
+            )
+            continue
+
+        incoming_value = _normalize_text_value(candidate.as_form_values().get(field_name))
+        current_value = _normalize_text_value(getattr(book, field_name, ""))
+
+        if not incoming_value:
+            summary["no_value"] += 1
+            results.append(
+                {
+                    "bookId": book.pk,
+                    "title": book.title,
+                    "status": "no_value",
+                    "message": "该来源没有返回这个字段的值。",
+                }
+            )
+            continue
+
+        if current_value == incoming_value:
+            summary["unchanged"] += 1
+            results.append(
+                {
+                    "bookId": book.pk,
+                    "title": book.title,
+                    "status": "unchanged",
+                    "message": "当前值和外部结果一致，已跳过。",
+                }
+            )
+            continue
+
+        setattr(book, field_name, incoming_value)
+        book.save(update_fields=[field_name, "updated_at"])
+        summary["updated"] += 1
+        results.append(
+            {
+                "bookId": book.pk,
+                "title": book.title,
+                "status": "updated",
+                "message": "已更新。",
+                "value": incoming_value,
+            }
+        )
+
+    return {
+        "success": True,
+        "provider": {"id": provider_id, "label": provider_label},
+        "field": {"id": field_name, "label": FIELD_LABELS[field_name]},
+        "summary": summary,
+        "results": results,
+        "message": _build_bulk_update_message(summary),
     }
 
 
@@ -473,3 +575,13 @@ def _truncate_text(value, limit):
     if len(text) <= limit:
         return text
     return f"{text[: limit - 1].rstrip()}…"
+
+
+def _build_bulk_update_message(summary):
+    if summary["updated"]:
+        return f"批量更新完成，已更新 {summary['updated']} 本。"
+    if summary["not_found"] == summary["total"] and summary["total"]:
+        return "所选书籍都没有找到匹配结果。"
+    if summary["unavailable"] == summary["total"] and summary["total"]:
+        return "当前来源暂时不可用，请稍后再试。"
+    return "批量更新已完成，没有可写入的新值。"
