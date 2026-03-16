@@ -259,6 +259,40 @@
             >
                 {% csrf_token %}
                 <div class="editor-drawer__body">
+                    {% if editor_mode == "edit" and selected_book %}
+                        <section
+                            class="drawer-section metadata-enrichment"
+                            data-metadata-enrichment
+                            data-preview-url="{% url 'books:metadata_preview' selected_book.pk %}"
+                            data-apply-url="{% url 'books:metadata_apply' selected_book.pk %}"
+                        >
+                            <div class="drawer-section__header">
+                                <div>
+                                    <h3>信息补全</h3>
+                                    <p>先预览字段差异，再把选中的内容填回当前表单。</p>
+                                </div>
+                            </div>
+
+                            <div class="drawer-grid drawer-grid--two metadata-enrichment__grid">
+                                <label class="field">
+                                    <span class="field__label">补全来源</span>
+                                    <select data-metadata-provider>
+                                        {% for provider in metadata_providers %}
+                                            <option value="{{ provider.id }}">{{ provider.label }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </label>
+
+                                <div class="field metadata-enrichment__action">
+                                    <span class="field__label">预览补全</span>
+                                    <button class="button button--secondary" type="button" data-metadata-preview-trigger>
+                                        获取预览
+                                    </button>
+                                    <span class="field__hint">默认按当前书名搜索，不会直接写入数据库。</span>
+                                </div>
+                            </div>
+                        </section>
+                    {% endif %}
                     {% if form.non_field_errors %}
                         <div class="form-errors">
                             {% for error in form.non_field_errors %}
@@ -278,4 +312,38 @@
         </aside>
     </div>
 {% endif %}
+
+<div class="metadata-modal" data-metadata-modal hidden>
+    <div class="metadata-modal__backdrop" data-metadata-modal-close></div>
+    <div class="metadata-modal__dialog" role="dialog" aria-modal="true" aria-labelledby="metadata-modal-title">
+        <div class="metadata-modal__header">
+            <div>
+                <p class="section-label">字段预览</p>
+                <h2 id="metadata-modal-title">书籍信息补全</h2>
+            </div>
+            <button class="button button--secondary" type="button" data-metadata-modal-close>关闭</button>
+        </div>
+
+        <div class="metadata-modal__body">
+            <section class="metadata-candidate" data-metadata-candidate></section>
+            <section class="metadata-fields">
+                <div class="metadata-fields__header">
+                    <h3>将要填入的字段</h3>
+                    <p>空字段默认勾选，已有内容的字段默认不勾选。</p>
+                </div>
+                <div class="metadata-fields__list" data-metadata-fields></div>
+            </section>
+        </div>
+
+        <div class="metadata-modal__footer">
+            <p class="metadata-modal__tip">确认后只会填入当前编辑表单，仍需点击保存才会真正更新。</p>
+            <div class="metadata-modal__actions">
+                <button class="button button--secondary" type="button" data-metadata-modal-close>取消</button>
+                <button class="button button--primary" type="button" data-metadata-apply-trigger>确认填入</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="toast-stack" data-toast-stack aria-live="polite" aria-atomic="true"></div>
 {% endblock %}

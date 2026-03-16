@@ -1,6 +1,8 @@
+import json
 import shutil
 import tempfile
 from decimal import Decimal
+from unittest.mock import patch
 
 from django.contrib.auth import get_user_model
 from django.core.files.uploadedfile import SimpleUploadedFile
@@ -8,6 +10,7 @@ from django.test import TestCase
 from django.test.utils import override_settings
 from django.urls import reverse
 
+from apps.books.metadata import MetadataCandidate
 from apps.books.models import Book, BookAsset, BookTag
 
 
@@ -216,3 +219,127 @@ class BookAssetTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIn("application/epub+zip", response["Content-Type"])
         self.assertIn("attachment", response["Content-Disposition"])
+
+
+class BookMetadataApiTests(TestCase):
+    def setUp(self):
+        self.book = Book.objects.create(
+            title="Sophie World",
+            author="Original Author",
+            status=Book.Status.READING,
+            visibility=Book.Visibility.PUBLIC,
+        )
+        self.staff = User.objects.create_user(
+            username="metadata_admin",
+            password="pass123456",
+            is_staff=True,
+        )
+        self.viewer = User.objects.create_user(
+            username="metadata_viewer",
+            password="pass123456",
+        )
+
+    def test_preview_requires_editor_permission(self):
+        response = self.client.post(
+            reverse("books:metadata_preview", args=[self.book.pk]),
+            data=json.dumps({"provider": "weread"}),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, 302)
+        self.assertIn(reverse("login"), response.url)
+
+    def test_preview_for_non_editor_returns_forbidden(self):
+        self.client.login(username="metadata_viewer", password="pass123456")
+
+        response = self.client.post(
+            reverse("books:metadata_preview", args=[self.book.pk]),
+            data=json.dumps({"provider": "weread"}),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, 403)
+
+    @patch("apps.books.metadata._lookup_candidate")
+    def test_preview_returns_field_diffs_and_preview_token(self, lookup_candidate):
+        self.client.login(username="metadata_admin", password="pass123456")
+        lookup_candidate.return_value = MetadataCandidate(
+            source_id="weread-1",
+            title="Sophie World",
+            author="Jostein Gaarder",
+            translator="Xiao Baosen",
+            publisher="Writer Press",
+            cover_image_url="https://example.com/cover.jpg",
+            short_review="A classic introduction to philosophy.",
+        )
+
+        response = self.client.post(
+            reverse("books:metadata_preview", args=[self.book.pk]),
+            data=json.dumps({"provider": "weread"}),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, 200)
+        payload = response.json()
+        self.assertEqual(payload["status"], "found")
+        self.assertEqual(payload["provider"]["id"], "weread")
+        self.assertTrue(payload["previewToken"])
+        field_names = {field["name"] for field in payload["fields"]}
+        self.assertIn("author", field_names)
+        self.assertIn("translator", field_names)
+        self.assertIn("publisher", field_names)
+        self.assertIn("cover_image_url", field_names)
+
+    @patch("apps.books.metadata._lookup_candidate")
+    def test_apply_returns_only_selected_fields(self, lookup_candidate):
+        self.client.login(username="metadata_admin", password="pass123456")
+        lookup_candidate.return_value = MetadataCandidate(
+            source_id="douban-1",
+            title="Sophie World",
+            author="Jostein Gaarder",
+            translator="Xiao Baosen",
+            publisher="Writer Press",
+            cover_image_url="https://example.com/cover.jpg",
+            short_review="A classic introduction to philosophy.",
+        )
+
+        preview_response = self.client.post(
+            reverse("books:metadata_preview", args=[self.book.pk]),
+            data=json.dumps({"provider": "douban"}),
+            content_type="application/json",
+        )
+        preview_payload = preview_response.json()
+
+        response = self.client.post(
+            reverse("books:metadata_apply", args=[self.book.pk]),
+            data=json.dumps(
+                {
+                    "previewToken": preview_payload["previewToken"],
+                    "fields": ["translator", "cover_image_url"],
+                }
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, 200)
+        payload = response.json()
+        self.assertEqual(payload["updatedFields"], ["translator", "cover_image_url"])
+        self.assertEqual(payload["values"]["translator"], "Xiao Baosen")
+        self.assertEqual(payload["values"]["cover_image_url"], "https://example.com/cover.jpg")
+        self.assertNotIn("author", payload["values"])
+
+    @patch("apps.books.metadata._lookup_candidate")
+    def test_preview_not_found_returns_status(self, lookup_candidate):
+        self.client.login(username="metadata_admin", password="pass123456")
+        lookup_candidate.return_value = None
+
+        response = self.client.post(
+            reverse("books:metadata_preview", args=[self.book.pk]),
+            data=json.dumps({"provider": "openlibrary"}),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, 200)
+        payload = response.json()
+        self.assertEqual(payload["status"], "not_found")
+        self.assertEqual(payload["provider"]["id"], "openlibrary")

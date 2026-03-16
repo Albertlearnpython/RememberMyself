@@ -1,13 +1,26 @@
+import json
 from urllib.parse import urlencode
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
-from django.http import FileResponse, Http404, HttpResponseForbidden
+from django.http import (
+    FileResponse,
+    Http404,
+    HttpResponseBadRequest,
+    HttpResponseForbidden,
+    JsonResponse,
+)
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
+from django.views.decorators.http import require_POST
 
 from apps.books.forms import BookEditorForm
+from apps.books.metadata import (
+    apply_metadata_preview,
+    build_metadata_preview,
+    get_metadata_provider_options,
+)
 from apps.books.models import Book, BookAsset, BookTag
 
 
@@ -107,6 +120,58 @@ def delete_asset(request, asset_id):
     return redirect("books:detail", book_id=book_id)
 
 
+@require_POST
+def metadata_preview(request, book_id):
+    permission_response = _require_editor(request)
+    if permission_response:
+        return permission_response
+
+    payload = _parse_json_body(request)
+    if payload is None:
+        return HttpResponseBadRequest("invalid json")
+
+    provider_id = (payload.get("provider") or "").strip()
+    query = payload.get("query") or ""
+    book = get_object_or_404(Book, pk=book_id)
+
+    try:
+        preview = build_metadata_preview(book, provider_id, query=query)
+    except ValueError:
+        return JsonResponse(
+            {"success": False, "message": "不支持的补全来源。"},
+            status=400,
+            json_dumps_params={"ensure_ascii": False},
+        )
+
+    return JsonResponse(preview, json_dumps_params={"ensure_ascii": False})
+
+
+@require_POST
+def metadata_apply(request, book_id):
+    permission_response = _require_editor(request)
+    if permission_response:
+        return permission_response
+
+    payload = _parse_json_body(request)
+    if payload is None:
+        return HttpResponseBadRequest("invalid json")
+
+    book = get_object_or_404(Book, pk=book_id)
+    preview_token = payload.get("previewToken") or ""
+    field_names = payload.get("fields") or []
+
+    try:
+        result = apply_metadata_preview(book, preview_token, field_names)
+    except ValueError as exc:
+        return JsonResponse(
+            {"success": False, "message": _metadata_apply_error_message(str(exc))},
+            status=400,
+            json_dumps_params={"ensure_ascii": False},
+        )
+
+    return JsonResponse(result, json_dumps_params={"ensure_ascii": False})
+
+
 def _render_books_page(request, selected_id=None, form=None, editor_mode=None):
     visible_books_qs = Book.objects.visible_to_user(request.user)
     books_qs = visible_books_qs
@@ -186,6 +251,7 @@ def _render_books_page(request, selected_id=None, form=None, editor_mode=None):
         "form": form,
         "can_edit": can_edit,
         "filter_query": _build_query_string(q=q, status=status, tag=tag),
+        "metadata_providers": get_metadata_provider_options(),
     }
     return render(request, "books/index.html", context)
 
@@ -211,3 +277,20 @@ def _require_editor(request):
     if not _user_can_edit(request.user):
         return HttpResponseForbidden("当前账号没有编辑权限。")
     return None
+
+
+def _parse_json_body(request):
+    try:
+        return json.loads(request.body.decode("utf-8") or "{}")
+    except (UnicodeDecodeError, json.JSONDecodeError):
+        return None
+
+
+def _metadata_apply_error_message(error_code):
+    if error_code == "preview token expired":
+        return "这次预览已经过期，请重新获取预览。"
+    if error_code in {"preview token invalid", "preview token mismatch"}:
+        return "预览校验失败，请重新获取预览。"
+    if error_code == "no fields selected":
+        return "请至少选择一个要填入的字段。"
+    return "补全失败，请重新获取预览。"
