@@ -84,12 +84,12 @@
                                 <span>{{ book.title|slice:":1" }}</span>
                             {% endif %}
                         </div>
-                        <div class="book-card__body">
-                            <div class="book-card__meta">
+                        <div class="book-card__body is-copyable">
+                            <div class="book-card__meta is-copyable">
                                 <strong>{{ book.title }}</strong>
                                 {% if book.subtitle %}<small>{{ book.subtitle }}</small>{% endif %}
                             </div>
-                            <p class="book-card__author">
+                            <p class="book-card__author is-copyable">
                                 {% if book.author %}{{ book.author }}{% else %}作者待补充{% endif %}
                             </p>
                             <div class="book-card__chips">
@@ -101,7 +101,7 @@
                                     <span class="meta-pill meta-pill--tone-{{ tag.name|tag_tone }}">{{ tag.name }}</span>
                                 {% endfor %}
                             </div>
-                            <p class="book-card__summary">
+                            <p class="book-card__summary is-copyable">
                                 {% if book.short_review %}
                                     {{ book.short_review }}
                                 {% else %}
@@ -137,7 +137,7 @@
                 </div>
 
                 <div class="book-detail__header">
-                    <div>
+                    <div class="is-copyable">
                         <h2>{{ selected_book.title }}</h2>
                         {% if selected_book.subtitle %}<p>{{ selected_book.subtitle }}</p>{% endif %}
                     </div>
@@ -147,12 +147,12 @@
                 </div>
 
                 <dl class="detail-meta">
-                    <div><dt>作者</dt><dd>{{ selected_book.author|default:"待补充" }}</dd></div>
-                    <div><dt>译者</dt><dd>{{ selected_book.translator|default:"-" }}</dd></div>
-                    <div><dt>出版</dt><dd>{{ selected_book.publisher|default:"-" }}{% if selected_book.publish_year %} · {{ selected_book.publish_year }}{% endif %}</dd></div>
-                    <div><dt>状态</dt><dd>{{ selected_book.get_status_display }}</dd></div>
-                    <div><dt>评分</dt><dd>{% if selected_book.rating %}{{ selected_book.rating }} / 100{% else %}-{% endif %}</dd></div>
-                    <div><dt>字数</dt><dd>{% if selected_book.word_count %}{{ selected_book.formatted_word_count }}{% else %}-{% endif %}</dd></div>
+                    <div><dt>作者</dt><dd class="is-copyable">{{ selected_book.author|default:"待补充" }}</dd></div>
+                    <div><dt>译者</dt><dd class="is-copyable">{{ selected_book.translator|default:"-" }}</dd></div>
+                    <div><dt>出版</dt><dd class="is-copyable">{{ selected_book.publisher|default:"-" }}{% if selected_book.publish_year %} · {{ selected_book.publish_year }}{% endif %}</dd></div>
+                    <div><dt>状态</dt><dd class="is-copyable">{{ selected_book.get_status_display }}</dd></div>
+                    <div><dt>评分</dt><dd class="is-copyable">{% if selected_book.rating %}{{ selected_book.rating }} / 100{% else %}-{% endif %}</dd></div>
+                    <div><dt>字数</dt><dd class="is-copyable">{% if selected_book.word_count %}{{ selected_book.formatted_word_count }}{% else %}-{% endif %}</dd></div>
                     <div>
                         <dt>标签</dt>
                         <dd class="detail-tags">
@@ -167,19 +167,19 @@
 
                 <section class="note-panel note-panel--accent">
                     <span class="section-label">为什么重要</span>
-                    <p>{{ selected_book.why_it_matters|default:"这部分还没写下。等你补上它为什么值得被记住。" }}</p>
+                    <p class="is-copyable">{{ selected_book.why_it_matters|default:"这部分还没写下。等你补上它为什么值得被记住。" }}</p>
                 </section>
 
                 <section class="note-panel">
                     <span class="section-label">长笔记</span>
-                    <div class="rich-copy">
+                    <div class="rich-copy is-copyable">
                         {{ selected_book.long_note|default:"这里以后会放下更完整的阅读笔记、摘录和回想。"|linebreaks }}
                     </div>
                 </section>
 
                 <section class="timeline-panel">
                     <span class="section-label">阅读时间线</span>
-                    <p>
+                    <p class="is-copyable">
                         {% if selected_book.reading_started_at %}开始：{{ selected_book.reading_started_at|date:"Y-m-d" }}{% else %}开始时间未记录{% endif %}
                         <br>
                         {% if selected_book.reading_finished_at %}完成：{{ selected_book.reading_finished_at|date:"Y-m-d" }}{% else %}完成时间未记录{% endif %}
@@ -200,7 +200,7 @@
                         <div class="asset-list">
                             {% for row in asset_rows %}
                                 <article class="asset-card">
-                                    <div>
+                                    <div class="is-copyable">
                                         <strong>{{ row.asset.file_name }}</strong>
                                         <p>{{ row.asset.get_asset_type_display }} · {{ row.asset.formatted_file_size }}</p>
                                     </div>

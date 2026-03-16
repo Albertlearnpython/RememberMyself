@@ -1,147 +1,175 @@
 {% load books_tags %}
-<div class="drawer-section">
-    <div class="drawer-grid drawer-grid--two">
-        <label class="field">
+<div class="drawer-section drawer-section--form">
+    <section class="drawer-subsection">
+        <div class="drawer-subsection__header">
+            <div>
+                <h4>基础书目</h4>
+                <p>先把书名、作者、出版社这些稳定信息整理好，后面的编辑会轻松很多。</p>
+            </div>
+        </div>
+
+        <label class="field field--feature">
             <span class="field__label">{{ form.title.label }}</span>
             {{ form.title }}
             {% for error in form.title.errors %}<span class="field__error">{{ error }}</span>{% endfor %}
         </label>
-        <label class="field">
-            <span class="field__label">{{ form.subtitle.label }}</span>
-            {{ form.subtitle }}
-        </label>
-    </div>
 
-    <div class="drawer-grid drawer-grid--three">
-        <label class="field">
-            <span class="field__label">{{ form.author.label }}</span>
-            {{ form.author }}
-        </label>
-        <label class="field">
-            <span class="field__label">{{ form.translator.label }}</span>
-            {{ form.translator }}
-        </label>
-        <label class="field">
-            <span class="field__label">{{ form.publisher.label }}</span>
-            {{ form.publisher }}
-        </label>
-    </div>
-
-    <div class="drawer-grid drawer-grid--three">
-        <label class="field">
-            <span class="field__label">{{ form.publish_year.label }}</span>
-            {{ form.publish_year }}
-        </label>
-        <label class="field">
-            <span class="field__label">{{ form.status.label }}</span>
-            {{ form.status }}
-        </label>
-        <label class="field">
-            <span class="field__label">{{ form.rating.label }}</span>
-            {{ form.rating }}
-            <span class="field__hint">改为 100 分制，留空表示暂未评分。</span>
-            {% for error in form.rating.errors %}<span class="field__error">{{ error }}</span>{% endfor %}
-        </label>
-    </div>
-
-    <div class="drawer-grid drawer-grid--two">
-        <label class="field">
-            <span class="field__label">{{ form.word_count.label }}</span>
-            {{ form.word_count }}
-            <span class="field__hint">单位是万字，支持小数，例如 8.5。</span>
-            {% for error in form.word_count.errors %}<span class="field__error">{{ error }}</span>{% endfor %}
-        </label>
-        <label class="field">
-            <span class="field__label">{{ form.cover_image_url.label }}</span>
-            {{ form.cover_image_url }}
-        </label>
-    </div>
-
-    <div class="drawer-grid drawer-grid--two">
-        <div class="field field--tag-picker" data-tag-picker>
-            <div class="field__label-row">
-                <span class="field__label">{{ form.tag_links.label }}</span>
-                <button
-                    class="tag-picker__toggle"
-                    type="button"
-                    data-tag-picker-toggle
-                    aria-expanded="false"
-                >
-                    <span class="tag-picker__summary" data-tag-picker-summary>选择已有标签</span>
-                    <span class="tag-picker__toggle-hint" data-tag-picker-toggle-hint>展开</span>
-                </button>
-            </div>
-            <span class="field__hint">已有标签收进下拉区，可搜索、可多选，不会把抽屉撑得太臃肿。</span>
-            <div class="tag-picker__panel" data-tag-picker-panel hidden>
-                <div class="tag-picker__toolbar">
-                    <input
-                        class="tag-picker__search"
-                        type="search"
-                        placeholder="搜索已有标签"
-                        data-tag-picker-search
-                    >
-                    <button class="tag-picker__clear" type="button" data-tag-picker-clear>清空已选</button>
-                </div>
-                <div class="tag-choice-grid tag-choice-grid--picker">
-                    {% for checkbox in form.tag_links %}
-                        <label
-                            class="tag-choice tag-choice--compact tag-choice--tone-{{ checkbox.choice_label|tag_tone }}"
-                            data-tag-choice
-                            data-tag-choice-label="{{ checkbox.choice_label }}"
-                        >
-                            {{ checkbox.tag }}
-                            <span>{{ checkbox.choice_label }}</span>
-                        </label>
-                    {% empty %}
-                        <span class="field__hint">当前还没有共用标签，你可以直接在右侧新建。</span>
-                    {% endfor %}
-                </div>
-            </div>
-            {% for error in form.tag_links.errors %}<span class="field__error">{{ error }}</span>{% endfor %}
+        <div class="drawer-grid drawer-grid--two">
+            <label class="field">
+                <span class="field__label">{{ form.subtitle.label }}</span>
+                {{ form.subtitle }}
+            </label>
+            <label class="field">
+                <span class="field__label">{{ form.cover_image_url.label }}</span>
+                {{ form.cover_image_url }}
+            </label>
         </div>
+
+        <div class="drawer-grid drawer-grid--three">
+            <label class="field">
+                <span class="field__label">{{ form.author.label }}</span>
+                {{ form.author }}
+            </label>
+            <label class="field">
+                <span class="field__label">{{ form.translator.label }}</span>
+                {{ form.translator }}
+            </label>
+            <label class="field">
+                <span class="field__label">{{ form.publisher.label }}</span>
+                {{ form.publisher }}
+            </label>
+        </div>
+
+        <div class="drawer-grid drawer-grid--three">
+            <label class="field">
+                <span class="field__label">{{ form.publish_year.label }}</span>
+                {{ form.publish_year }}
+            </label>
+            <label class="field">
+                <span class="field__label">{{ form.status.label }}</span>
+                {{ form.status }}
+            </label>
+            <label class="field">
+                <span class="field__label">{{ form.rating.label }}</span>
+                {{ form.rating }}
+                <span class="field__hint">改为 100 分制，留空表示暂未评分。</span>
+                {% for error in form.rating.errors %}<span class="field__error">{{ error }}</span>{% endfor %}
+            </label>
+        </div>
+
+        <div class="drawer-grid drawer-grid--two">
+            <label class="field">
+                <span class="field__label">{{ form.word_count.label }}</span>
+                {{ form.word_count }}
+                <span class="field__hint">单位是万字，支持小数，例如 8.5。</span>
+                {% for error in form.word_count.errors %}<span class="field__error">{{ error }}</span>{% endfor %}
+            </label>
+            <label class="field">
+                <span class="field__label">{{ form.visibility.label }}</span>
+                {{ form.visibility }}
+            </label>
+        </div>
+
         <label class="field">
-            <span class="field__label">{{ form.new_tags.label }}</span>
-            {{ form.new_tags }}
-            <span class="field__hint">可输入多个，用逗号分隔；不存在的标签会自动创建并复用。</span>
-            {% for error in form.new_tags.errors %}<span class="field__error">{{ error }}</span>{% endfor %}
+            <span class="field__label">{{ form.short_review.label }}</span>
+            {{ form.short_review }}
         </label>
-    </div>
+    </section>
 
-    <div class="drawer-grid drawer-grid--two">
+    <section class="drawer-subsection">
+        <div class="drawer-subsection__header">
+            <div>
+                <h4>标签与归类</h4>
+                <p>把共用标签和新增标签放在同一区，减少来回滚动。</p>
+            </div>
+        </div>
+
+        <div class="drawer-grid drawer-grid--two">
+            <div class="field field--tag-picker" data-tag-picker>
+                <div class="field__label-row">
+                    <span class="field__label">{{ form.tag_links.label }}</span>
+                    <button
+                        class="tag-picker__toggle"
+                        type="button"
+                        data-tag-picker-toggle
+                        aria-expanded="false"
+                    >
+                        <span class="tag-picker__summary" data-tag-picker-summary>选择已有标签</span>
+                        <span class="tag-picker__toggle-hint" data-tag-picker-toggle-hint>展开</span>
+                    </button>
+                </div>
+                <span class="field__hint">已有标签收进下拉区，可搜索、可多选，不会把抽屉撑得太臃肿。</span>
+                <div class="tag-picker__panel" data-tag-picker-panel hidden>
+                    <div class="tag-picker__toolbar">
+                        <input
+                            class="tag-picker__search"
+                            type="search"
+                            placeholder="搜索已有标签"
+                            data-tag-picker-search
+                        >
+                        <button class="tag-picker__clear" type="button" data-tag-picker-clear>清空已选</button>
+                    </div>
+                    <div class="tag-choice-grid tag-choice-grid--picker">
+                        {% for checkbox in form.tag_links %}
+                            <label
+                                class="tag-choice tag-choice--compact tag-choice--tone-{{ checkbox.choice_label|tag_tone }}"
+                                data-tag-choice
+                                data-tag-choice-label="{{ checkbox.choice_label }}"
+                            >
+                                {{ checkbox.tag }}
+                                <span>{{ checkbox.choice_label }}</span>
+                            </label>
+                        {% empty %}
+                            <span class="field__hint">当前还没有共用标签，你可以直接在右侧新建。</span>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% for error in form.tag_links.errors %}<span class="field__error">{{ error }}</span>{% endfor %}
+            </div>
+
+            <label class="field">
+                <span class="field__label">{{ form.new_tags.label }}</span>
+                {{ form.new_tags }}
+                <span class="field__hint">可输入多个，用逗号分隔；不存在的标签会自动创建并复用。</span>
+                {% for error in form.new_tags.errors %}<span class="field__error">{{ error }}</span>{% endfor %}
+            </label>
+        </div>
+    </section>
+
+    <section class="drawer-subsection">
+        <div class="drawer-subsection__header">
+            <div>
+                <h4>阅读记录与感受</h4>
+                <p>把阅读时间、重要原因和长笔记放在一起，编辑节奏会更顺。</p>
+            </div>
+        </div>
+
+        <div class="drawer-grid drawer-grid--two">
+            <label class="field">
+                <span class="field__label">{{ form.reading_started_at.label }}</span>
+                {{ form.reading_started_at }}
+            </label>
+            <label class="field">
+                <span class="field__label">{{ form.reading_finished_at.label }}</span>
+                {{ form.reading_finished_at }}
+            </label>
+        </div>
+
         <label class="field">
-            <span class="field__label">{{ form.reading_started_at.label }}</span>
-            {{ form.reading_started_at }}
+            <span class="field__label">{{ form.why_it_matters.label }}</span>
+            {{ form.why_it_matters }}
         </label>
+
         <label class="field">
-            <span class="field__label">{{ form.reading_finished_at.label }}</span>
-            {{ form.reading_finished_at }}
+            <span class="field__label">{{ form.long_note.label }}</span>
+            {{ form.long_note }}
         </label>
-    </div>
-
-    <label class="field">
-        <span class="field__label">{{ form.short_review.label }}</span>
-        {{ form.short_review }}
-    </label>
-
-    <label class="field">
-        <span class="field__label">{{ form.why_it_matters.label }}</span>
-        {{ form.why_it_matters }}
-    </label>
-
-    <label class="field">
-        <span class="field__label">{{ form.long_note.label }}</span>
-        {{ form.long_note }}
-    </label>
-
-    <label class="field">
-        <span class="field__label">{{ form.visibility.label }}</span>
-        {{ form.visibility }}
-    </label>
+    </section>
 </div>
 
-<div class="drawer-section">
+<div class="drawer-section drawer-section--form">
     <div class="drawer-section__header">
-        <h3>受保护文件</h3>
+        <h3>附件归档</h3>
         <p>这里上传的文件会出现在书籍详情的附件区，用于归档和下载。</p>
     </div>
 
