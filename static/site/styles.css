@@ -253,6 +253,12 @@ button {
     max-width: 760px;
 }
 
+.section-heading--wide {
+    max-width: none;
+    display: grid;
+    gap: 10px;
+}
+
 .section-heading h2,
 .home-hero h1,
 .books-page__header h1,
@@ -339,6 +345,334 @@ button {
     gap: 12px;
     flex-wrap: wrap;
     margin-top: 28px;
+}
+
+.home-hero--streams {
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+    background:
+        radial-gradient(circle at top right, rgba(94, 215, 255, 0.12), transparent 24%),
+        radial-gradient(circle at bottom left, rgba(242, 183, 102, 0.12), transparent 28%),
+        linear-gradient(180deg, rgba(13, 22, 37, 0.98), rgba(9, 17, 29, 0.98));
+}
+
+.home-hero--streams::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+        linear-gradient(135deg, rgba(116, 167, 255, 0.08), transparent 36%),
+        radial-gradient(circle at 22% 24%, rgba(255, 255, 255, 0.06), transparent 20%);
+    pointer-events: none;
+}
+
+.memory-streams,
+.module-index,
+.updates-section {
+    display: grid;
+    gap: 20px;
+}
+
+.memory-streams__lead {
+    max-width: 720px;
+    margin: 0;
+    color: var(--text-muted);
+    font-size: 16px;
+}
+
+.stream-stack {
+    display: grid;
+    gap: 22px;
+}
+
+.stream-section {
+    --stream-accent: var(--brand);
+    --stream-accent-soft: rgba(116, 167, 255, 0.24);
+    --stream-accent-ghost: rgba(116, 167, 255, 0.12);
+    display: grid;
+    gap: 18px;
+    padding: 26px;
+    border: 1px solid var(--line);
+    border-radius: 28px;
+    background:
+        radial-gradient(circle at top right, var(--stream-accent-ghost), transparent 28%),
+        linear-gradient(180deg, rgba(15, 25, 42, 0.96), rgba(10, 19, 34, 0.96));
+    box-shadow: var(--shadow-soft);
+}
+
+.stream-section--books {
+    --stream-accent: #8fb6ff;
+    --stream-accent-soft: rgba(143, 182, 255, 0.24);
+    --stream-accent-ghost: rgba(143, 182, 255, 0.12);
+}
+
+.stream-section--music {
+    --stream-accent: #78deef;
+    --stream-accent-soft: rgba(120, 222, 239, 0.22);
+    --stream-accent-ghost: rgba(120, 222, 239, 0.1);
+}
+
+.stream-section--food {
+    --stream-accent: #f0b36c;
+    --stream-accent-soft: rgba(240, 179, 108, 0.22);
+    --stream-accent-ghost: rgba(240, 179, 108, 0.1);
+}
+
+.stream-section--scenery {
+    --stream-accent: #9fcfb4;
+    --stream-accent-soft: rgba(159, 207, 180, 0.22);
+    --stream-accent-ghost: rgba(159, 207, 180, 0.1);
+}
+
+.stream-section__header {
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.stream-section__heading {
+    display: grid;
+    gap: 6px;
+    max-width: 620px;
+}
+
+.stream-section__heading .section-label {
+    margin-bottom: 0;
+}
+
+.stream-section__heading h3 {
+    margin: 0;
+    color: var(--text-strong);
+    font-family: var(--font-title);
+    font-size: clamp(24px, 2.8vw, 32px);
+    font-weight: 600;
+    line-height: 1.18;
+}
+
+.stream-section__heading p {
+    margin: 0;
+    color: var(--text-muted);
+    font-size: 15px;
+}
+
+.stream-section__meta {
+    display: grid;
+    gap: 12px;
+    justify-items: end;
+}
+
+.stream-section__count {
+    display: inline-flex;
+    align-items: center;
+    min-height: 30px;
+    padding: 0 12px;
+    border: 1px solid var(--stream-accent-soft);
+    border-radius: 999px;
+    background: var(--stream-accent-ghost);
+    color: var(--text-strong);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+}
+
+.stream-section__enter {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--stream-accent);
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.stream-section__enter::after {
+    content: "→";
+    font-size: 14px;
+    line-height: 1;
+}
+
+.stream-viewport {
+    position: relative;
+    overflow: hidden;
+    min-height: 190px;
+    padding: 16px 0 18px;
+    border: 1px solid rgba(167, 180, 199, 0.14);
+    border-radius: 24px;
+    background: linear-gradient(180deg, rgba(11, 20, 35, 0.88), rgba(9, 17, 30, 0.96));
+}
+
+.stream-viewport--empty {
+    display: grid;
+    align-content: end;
+    min-height: 160px;
+}
+
+.stream-viewport__fade {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    z-index: 2;
+    width: 72px;
+    pointer-events: none;
+}
+
+.stream-viewport__fade--left {
+    left: 0;
+    background: linear-gradient(90deg, rgba(9, 17, 30, 0.98), rgba(9, 17, 30, 0));
+}
+
+.stream-viewport__fade--right {
+    right: 0;
+    background: linear-gradient(270deg, rgba(9, 17, 30, 0.98), rgba(9, 17, 30, 0));
+}
+
+.stream-lanes {
+    display: grid;
+    gap: 14px;
+}
+
+.stream-lane {
+    overflow: hidden;
+}
+
+.stream-track {
+    --stream-duration: 72s;
+    --stream-gap: 14px;
+    display: flex;
+    align-items: flex-start;
+    gap: var(--stream-gap);
+    width: max-content;
+    will-change: transform;
+}
+
+.stream-lane--left .stream-track {
+    animation: stream-slide-left var(--stream-duration) linear infinite;
+}
+
+.stream-lane--right .stream-track {
+    animation: stream-slide-right var(--stream-duration) linear infinite;
+}
+
+.stream-section:hover .stream-track {
+    animation-play-state: paused;
+}
+
+.stream-card {
+    position: relative;
+    display: block;
+    flex: 0 0 auto;
+    overflow: hidden;
+    border: 1px solid rgba(167, 180, 199, 0.16);
+    border-radius: 18px;
+    background: linear-gradient(180deg, rgba(19, 31, 49, 0.96), rgba(13, 22, 36, 0.96));
+    box-shadow: 0 16px 30px rgba(3, 8, 18, 0.28);
+    transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+}
+
+.stream-card:hover {
+    transform: translateY(-2px);
+    border-color: var(--stream-accent-soft);
+    box-shadow: 0 20px 36px rgba(3, 8, 18, 0.34);
+}
+
+.stream-card--books {
+    width: 112px;
+    aspect-ratio: 3 / 4;
+}
+
+.stream-card--music {
+    width: 136px;
+    aspect-ratio: 1 / 1;
+}
+
+.stream-card--food {
+    width: 178px;
+    aspect-ratio: 4 / 3;
+}
+
+.stream-card--scenery {
+    width: 208px;
+    aspect-ratio: 16 / 10;
+}
+
+.stream-card__visual {
+    display: grid;
+    width: 100%;
+    height: 100%;
+    place-items: center;
+    background:
+        radial-gradient(circle at top left, rgba(255, 255, 255, 0.08), transparent 28%),
+        linear-gradient(160deg, rgba(87, 202, 255, 0.16), rgba(210, 188, 151, 0.16));
+}
+
+.stream-card__visual img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.stream-card__fallback {
+    color: rgba(247, 251, 255, 0.82);
+    font-family: var(--font-title);
+    font-size: 34px;
+    font-weight: 600;
+}
+
+.stream-card__overlay {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    display: grid;
+    gap: 3px;
+    padding: 38px 12px 12px;
+    background: linear-gradient(180deg, rgba(7, 13, 23, 0), rgba(7, 13, 23, 0.9));
+}
+
+.stream-card__overlay strong,
+.stream-card__overlay small {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.stream-card__overlay strong {
+    color: var(--text-strong);
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.stream-card__overlay small {
+    color: rgba(214, 224, 240, 0.74);
+    font-size: 11px;
+}
+
+.stream-card--ghost {
+    pointer-events: none;
+    border-style: dashed;
+    background:
+        linear-gradient(180deg, rgba(16, 27, 44, 0.82), rgba(12, 22, 39, 0.92));
+    box-shadow: none;
+}
+
+.stream-card--ghost::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+        linear-gradient(125deg, transparent 18%, rgba(255, 255, 255, 0.06) 50%, transparent 82%);
+    transform: translateX(-100%);
+    animation: stream-ghost-glimmer 5.4s ease-in-out infinite;
+}
+
+.stream-empty-note {
+    position: relative;
+    z-index: 1;
+    max-width: 58ch;
+    margin: 14px 18px 0;
+    color: var(--text-muted);
+    font-size: 13px;
 }
 
 .focus-grid,
@@ -1638,6 +1972,37 @@ button {
     }
 }
 
+@keyframes stream-slide-left {
+    from {
+        transform: translateX(0);
+    }
+    to {
+        transform: translateX(calc(-50% - (var(--stream-gap) / 2)));
+    }
+}
+
+@keyframes stream-slide-right {
+    from {
+        transform: translateX(calc(-50% - (var(--stream-gap) / 2)));
+    }
+    to {
+        transform: translateX(0);
+    }
+}
+
+@keyframes stream-ghost-glimmer {
+    0%,
+    18% {
+        transform: translateX(-100%);
+    }
+    42% {
+        transform: translateX(100%);
+    }
+    100% {
+        transform: translateX(100%);
+    }
+}
+
 @media (max-width: 1100px) {
     .updates-grid,
     .focus-grid {
@@ -1679,6 +2044,95 @@ button {
 
     .home-hero__body {
         font-size: 15px;
+    }
+
+    .memory-streams,
+    .module-index,
+    .updates-section,
+    .stream-stack {
+        gap: 16px;
+    }
+
+    .section-heading--wide {
+        gap: 8px;
+    }
+
+    .memory-streams__lead {
+        font-size: 14px;
+    }
+
+    .stream-section {
+        gap: 16px;
+        padding: 18px;
+        border-radius: 22px;
+    }
+
+    .stream-section__header {
+        align-items: start;
+        flex-direction: column;
+    }
+
+    .stream-section__heading h3 {
+        font-size: 22px;
+    }
+
+    .stream-section__meta {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+
+    .stream-viewport {
+        min-height: 150px;
+        margin: 0 -18px;
+        padding: 12px 0 14px;
+        border-right: 0;
+        border-left: 0;
+        border-radius: 0;
+    }
+
+    .stream-viewport__fade {
+        width: 42px;
+    }
+
+    .stream-card {
+        border-radius: 15px;
+    }
+
+    .stream-card--books {
+        width: 84px;
+    }
+
+    .stream-card--music {
+        width: 106px;
+    }
+
+    .stream-card--food {
+        width: 144px;
+    }
+
+    .stream-card--scenery {
+        width: 164px;
+    }
+
+    .stream-card__fallback {
+        font-size: 26px;
+    }
+
+    .stream-card__overlay {
+        padding: 28px 10px 10px;
+    }
+
+    .stream-card__overlay strong {
+        font-size: 12px;
+    }
+
+    .stream-empty-note {
+        margin: 12px 16px 0;
+        font-size: 12px;
     }
 
     .books-search {

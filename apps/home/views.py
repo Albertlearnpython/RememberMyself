@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from django.urls import reverse
 from django.utils import timezone
 
 from apps.books.models import Book
@@ -7,90 +8,199 @@ from apps.core.site_data import SITE_TAGLINE, get_site_modules
 
 def index(request):
     modules = get_site_modules()
-    visible_books = Book.objects.visible_to_user(request.user)
-    current_book = visible_books.filter(
-        status__in=[Book.Status.READING, Book.Status.REVISITING]
-    ).first() or visible_books.first()
-    latest_book = visible_books.first()
-    total_books = visible_books.count()
+    visible_books = list(Book.objects.visible_to_user(request.user))
+    latest_book = visible_books[0] if visible_books else None
     implemented_modules = sum(1 for module in modules if module["available"])
     today = timezone.localdate()
 
     hero = {
-        "eyebrow": f"{today:%Y年%m月%d日} · {SITE_TAGLINE}",
-        "title": "记住自己，是一场缓慢而长期的整理。",
+        "eyebrow": f"{today:%Y年%m月%d日} / {SITE_TAGLINE}",
+        "title": "我把真正留下来的东西，放在这里，让它们缓慢流过。",
         "body": (
-            "这里不是展示型官网，而是一份会持续扩展的个人档案册入口。"
-            "首页只做一件事：安静、精确地把重要的东西带到你眼前。"
+            "这里不是展示型官网，而是一份仍在生长的个人档案册入口。"
+            " 书、声音、食物和风景不急着解释自己，只先在首页安静出现。"
         ),
-        "primary_action": {"label": "进入收藏书籍", "path": "/books/"},
-        "secondary_action": {"label": "查看当前关注", "path": "/#current-focus"},
+        "primary_action": {"label": "进入私人藏书室", "path": reverse("books:index")},
+        "secondary_action": {"label": "看记忆溪流", "path": "/#memory-streams"},
     }
 
-    focus_items = [
-        {
-            "eyebrow": "当前阅读",
-            "title": current_book.title if current_book else "还没有放入第一本书",
-            "meta": current_book.author if current_book and current_book.author else "从书籍页开始建立你的第一份私人阅览室。",
-            "path": "/books/",
-        },
-        {
-            "eyebrow": "书籍馆藏",
-            "title": f"{total_books} 本已归入目录" if total_books else "目录仍在建立中",
-            "meta": "公开阅读，登录后可进入受保护资源与编辑流程。",
-            "path": "/books/",
-        },
-        {
-            "eyebrow": "模块进度",
-            "title": f"{implemented_modules} / {len(modules)} 个板块进入首版开发",
-            "meta": "首页与收藏书籍已开工，其余板块保留独立入口和后续扩展空间。",
-            "path": "/#module-index",
-        },
-        {
-            "eyebrow": "记录方式",
-            "title": "每个板块独立，但共用同一套安静秩序",
-            "meta": "以后新增页面时，不需要推翻整体结构，只是在总索引里增加一页。",
-            "path": "/methods/",
-        },
-    ]
+    memory_streams = _build_memory_streams(visible_books)
 
     recent_updates = [
         {
             "module": "收藏书籍",
             "summary": f"最近整理到《{latest_book.title}》。"
             if latest_book
-            else "首版书籍页已接上列表、详情、受保护文件与登录编辑入口。",
+            else "书影流已经接上真实封面，后续会继续把更多模块流入首页。",
             "time": latest_book.updated_at.strftime("%Y-%m-%d")
             if latest_book
             else "第一版",
-            "path": f"/books/{latest_book.pk}/" if latest_book else "/books/",
+            "path": reverse("books:detail", args=[latest_book.pk])
+            if latest_book
+            else reverse("books:index"),
         },
         {
             "module": "首页",
-            "summary": "首页开始承担总索引角色，提供模块面板、当前关注与最近更新。",
-            "time": "第一版",
-            "path": "/",
+            "summary": "首页开始承担“记忆溪流”角色，让内容以流带而不是卡片墙的方式出现。",
+            "time": "施工中",
+            "path": "/#memory-streams",
         },
         {
             "module": "喜欢的美食",
-            "summary": "保留独立入口，后续会接上图片、做法与偏好记录。",
-            "time": "设计阶段",
-            "path": "/food/",
+            "summary": "食味流已预留位置，等真实内容录入后会直接接入首页流带。",
+            "time": "待录入",
+            "path": reverse("core:food"),
         },
         {
             "module": "喜欢的音乐",
-            "summary": "后续会扩展上传、下载和播放能力，资源仍然纳入权限分层。",
-            "time": "设计阶段",
-            "path": "/music/",
+            "summary": "声纹流结构已就位，后续会改为真实专辑封面与播放相关信息。",
+            "time": "待录入",
+            "path": reverse("core:music"),
         },
     ]
 
     context = {
         "page_title": "首页",
         "hero": hero,
-        "focus_items": focus_items,
+        "memory_streams": memory_streams,
         "modules": modules,
         "recent_updates": recent_updates,
-        "archive_quote": "这里不是信息流，而是慢慢长成的个人归档。",
+        "archive_quote": "流过首页的，只是入口。真正的停留，发生在每一个板块里面。",
+        "module_index_summary": (
+            f"{implemented_modules} 个板块已经进入首版建设，其余入口保持独立，"
+            "以后新增页面时不需要推翻首页，只需要把新的流向接进来。"
+        ),
     }
     return render(request, "home/index.html", context)
+
+
+def _build_memory_streams(books):
+    book_items = [_build_book_stream_item(book) for book in books]
+    return [
+        {
+            "key": "books",
+            "tone": "books",
+            "title": "书影流",
+            "subtitle": "私人藏书",
+            "description": "读过的、在读的、准备靠近的，都先以封面留下。",
+            "count_label": f"{len(book_items)} 本" if book_items else "尚未入册",
+            "enter_label": "进入藏书室",
+            "path": reverse("books:index"),
+            "rows": _build_stream_rows(
+                book_items,
+                lane_count=2,
+                direction="left",
+                durations=(78, 92),
+            ),
+            "empty_note": None if book_items else "第一本书录入后，书影流会从这里开始缓慢流动。",
+        },
+        {
+            "key": "music",
+            "tone": "music",
+            "title": "声纹流",
+            "subtitle": "喜欢的音乐",
+            "description": "一首歌有时比一句话更像记忆本身。",
+            "count_label": "待录入",
+            "enter_label": "进入音乐页",
+            "path": reverse("core:music"),
+            "rows": _build_placeholder_rows(
+                kind="music",
+                lane_count=1,
+                direction="right",
+                durations=(52,),
+                item_count=12,
+            ),
+            "empty_note": "真实音乐内容录入后，会在这里以专辑封面的方式持续流过。",
+        },
+        {
+            "key": "food",
+            "tone": "food",
+            "title": "食味流",
+            "subtitle": "喜欢的美食",
+            "description": "我记住的不只是味道，还有它靠近生活的方式。",
+            "count_label": "待录入",
+            "enter_label": "进入美食页",
+            "path": reverse("core:food"),
+            "rows": _build_placeholder_rows(
+                kind="food",
+                lane_count=2,
+                direction="left",
+                durations=(66, 58),
+                item_count=8,
+            ),
+            "empty_note": "食物照片和做法录入后，会把这条流带从占位变成真实生活切片。",
+        },
+        {
+            "key": "scenery",
+            "tone": "scenery",
+            "title": "风景流",
+            "subtitle": "喜欢的景色",
+            "description": "有些地方并不属于我，却长期停在我的视线里。",
+            "count_label": "待录入",
+            "enter_label": "进入景色页",
+            "path": reverse("core:scenery"),
+            "rows": _build_placeholder_rows(
+                kind="scenery",
+                lane_count=1,
+                direction="right",
+                durations=(74,),
+                item_count=7,
+            ),
+            "empty_note": "景色模块有真实照片后，这里会变成横向漂流的远景带。",
+        },
+    ]
+
+
+def _build_book_stream_item(book):
+    return {
+        "id": f"book-{book.pk}",
+        "kind": "book",
+        "title": book.title,
+        "meta": book.get_status_display(),
+        "path": reverse("books:detail", args=[book.pk]),
+        "image_url": book.cover_image_url,
+        "fallback": (book.title or "?")[:1],
+    }
+
+
+def _build_stream_rows(items, lane_count, direction, durations):
+    if not items:
+        return []
+
+    rows = []
+    for index in range(lane_count):
+        lane_items = items[index::lane_count] or items
+        lane_items = _ensure_lane_density(lane_items, minimum_items=6)
+        rows.append(
+            {
+                "direction": direction,
+                "duration": durations[index % len(durations)],
+                "items": lane_items + lane_items,
+            }
+        )
+    return rows
+
+
+def _build_placeholder_rows(kind, lane_count, direction, durations, item_count):
+    placeholders = [
+        {
+            "id": f"{kind}-ghost-{index}",
+            "kind": kind,
+            "placeholder": True,
+        }
+        for index in range(item_count)
+    ]
+    rows = _build_stream_rows(placeholders, lane_count, direction, durations)
+    for row in rows:
+        for item in row["items"]:
+            item["placeholder"] = True
+    return rows
+
+
+def _ensure_lane_density(items, minimum_items):
+    if not items:
+        return []
+    lane_items = list(items)
+    while len(lane_items) < minimum_items:
+        lane_items.extend(items)
+    return lane_items[: max(minimum_items, len(items))]

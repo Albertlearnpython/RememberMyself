@@ -39,6 +39,7 @@ docs/
 - [首页高保真说明（中文）](./design/home/visual-spec.zh-CN.md)
 - [首页版式深化说明（中文）](./design/home/ui-composition.zh-CN.md)
 - [首页最终视觉稿说明（中文）](./design/home/final-visual-spec.zh-CN.md)
+- [首页四条流带设计稿（中文）](./design/home/memory-streams.zh-CN.md)
 - [Home Design Overview (English)](./design/home/overview.en.md)
 
 ### 收藏书籍
@@ -113,6 +114,7 @@ docs/
 - 收藏书籍页当前字段结构先保持现有方案
 - 收藏书籍模块定位已调整为“封面展示 + 附件归档 + 下载”，不做站内阅读
 - 首页继续深化到更接近正式 UI 的版式说明
+- 首页“四条记忆溪流”已进入真实施工阶段
 - 收藏书籍页已经补充字段设计和手机端交互方案
 - 首页已经补足正式跳转规则和最终视觉规格
 - 收藏书籍页已经进入前端可直接照着实现的视觉规格层

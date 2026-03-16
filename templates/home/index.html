@@ -3,7 +3,7 @@
 {% block body_class %}page page--home{% endblock %}
 
 {% block content %}
-<section class="home-hero">
+<section class="home-hero home-hero--streams">
     <p class="section-label">{{ hero.eyebrow }}</p>
     <h1>{{ hero.title }}</h1>
     <p class="home-hero__body">{{ hero.body }}</p>
@@ -13,26 +13,79 @@
     </div>
 </section>
 
-<section class="focus-section" id="current-focus">
-    <div class="section-heading">
-        <p class="section-label">当前关注</p>
-        <h2>首页不负责喧闹，只负责把重要的线索摆对位置。</h2>
+<section class="memory-streams" id="memory-streams">
+    <div class="section-heading section-heading--wide">
+        <p class="section-label">记忆溪流</p>
+        <h2>书、声音、食物和风景先在首页出现，再把人带回各自的房间。</h2>
+        <p class="memory-streams__lead">这里不是卡片墙，也不是信息流，而是四条持续缓慢流动的内容带。</p>
     </div>
-    <div class="focus-grid">
-        {% for item in focus_items %}
-            <a class="focus-card" href="{{ item.path }}">
-                <span class="focus-card__eyebrow">{{ item.eyebrow }}</span>
-                <strong>{{ item.title }}</strong>
-                <small>{{ item.meta }}</small>
-            </a>
+
+    <div class="stream-stack">
+        {% for stream in memory_streams %}
+            <section class="stream-section stream-section--{{ stream.tone }}">
+                <div class="stream-section__header">
+                    <div class="stream-section__heading">
+                        <p class="section-label">{{ stream.title }}</p>
+                        <h3>{{ stream.subtitle }}</h3>
+                        <p>{{ stream.description }}</p>
+                    </div>
+                    <div class="stream-section__meta">
+                        <span class="stream-section__count">{{ stream.count_label }}</span>
+                        <a class="stream-section__enter" href="{{ stream.path }}">{{ stream.enter_label }}</a>
+                    </div>
+                </div>
+
+                <div class="stream-viewport{% if not stream.rows %} stream-viewport--empty{% endif %}">
+                    <div class="stream-viewport__fade stream-viewport__fade--left" aria-hidden="true"></div>
+                    <div class="stream-viewport__fade stream-viewport__fade--right" aria-hidden="true"></div>
+
+                    {% if stream.rows %}
+                        <div class="stream-lanes">
+                            {% for row in stream.rows %}
+                                <div class="stream-lane stream-lane--{{ row.direction }}">
+                                    <div class="stream-track" style="--stream-duration: {{ row.duration }}s;">
+                                        {% for item in row.items %}
+                                            {% if item.placeholder %}
+                                                <div
+                                                    class="stream-card stream-card--{{ stream.tone }} stream-card--ghost"
+                                                    aria-hidden="true"
+                                                ></div>
+                                            {% else %}
+                                                <a class="stream-card stream-card--{{ stream.tone }}" href="{{ item.path }}">
+                                                    <span class="stream-card__visual">
+                                                        {% if item.image_url %}
+                                                            <img src="{{ item.image_url }}" alt="{{ item.title }}">
+                                                        {% else %}
+                                                            <span class="stream-card__fallback">{{ item.fallback }}</span>
+                                                        {% endif %}
+                                                    </span>
+                                                    <span class="stream-card__overlay">
+                                                        <strong>{{ item.title }}</strong>
+                                                        <small>{{ item.meta }}</small>
+                                                    </span>
+                                                </a>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+
+                    {% if stream.empty_note %}
+                        <p class="stream-empty-note">{{ stream.empty_note }}</p>
+                    {% endif %}
+                </div>
+            </section>
         {% endfor %}
     </div>
 </section>
 
 <section class="module-index" id="module-index">
-    <div class="section-heading">
+    <div class="section-heading section-heading--wide">
         <p class="section-label">模块索引</p>
-        <h2>每一个页面都是独立板块，以后可以单独扩展、重写和继续生长。</h2>
+        <h2>流带负责把内容带到眼前，索引负责把整个结构放回秩序里。</h2>
+        <p class="memory-streams__lead">{{ module_index_summary }}</p>
     </div>
     <div class="module-grid">
         {% for module in modules %}
@@ -47,9 +100,9 @@
 </section>
 
 <section class="updates-section" id="recent-updates">
-    <div class="section-heading">
+    <div class="section-heading section-heading--wide">
         <p class="section-label">最近更新</p>
-        <h2>先让结构成立，再让内容慢慢长出来。</h2>
+        <h2>先让河道成立，再让更多真实内容慢慢流进来。</h2>
     </div>
     <div class="updates-grid">
         {% for item in recent_updates %}
