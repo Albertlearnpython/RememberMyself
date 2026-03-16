@@ -79,7 +79,7 @@ stateDiagram-v2
       "subtitle": "写给自己的十二卷札记",
       "author": "马可·奥勒留",
       "status": "reading",
-      "rating": 5,
+      "rating": 92,
       "tags": ["哲学", "自我管理", "反思"],
       "shortReview": "适合反复拿起来的书。",
       "coverImageUrl": "https://example.com/book-cover.jpg",
@@ -99,8 +99,8 @@ stateDiagram-v2
 | --- | --- | --- | --- |
 | `id` | `number` | `12` | 书籍主键 |
 | `status` | `string` | `reading` | 阅读状态，前端映射状态色 |
-| `rating` | `number \| null` | `5` | 五分制评分，没有评分时返回 `null` |
-| `tags` | `string[]` | `["哲学","自我管理"]` | 标签数组，列表页通常只展示前 2 到 3 个 |
+| `rating` | `number \| null` | `92` | 100 分制评分，没有评分时返回 `null` |
+| `tags` | `string[]` | `["哲学","自我管理"]` | 标签数组，来自共享标签库，列表页通常只展示前 2 到 3 个 |
 | `shortReview` | `string` | `适合反复拿起来的书。` | 列表卡短评 |
 | `detailPath` | `string` | `/books/12` | 前端可直接跳转的详情路径 |
 | `meta.total` | `number` | `1` | 当前筛选条件下的总数 |
@@ -119,7 +119,7 @@ stateDiagram-v2
     "publisher": "中央编译出版社",
     "publishYear": 2016,
     "status": "reading",
-    "rating": 5,
+    "rating": 92,
     "tags": ["哲学", "自我管理", "反思"],
     "whyItMatters": "它帮人把情绪从外部拉回内部。",
     "longNote": "这里放较长的阅读笔记、摘录和回想。",
@@ -156,6 +156,9 @@ stateDiagram-v2
   "title": "金刚经说什么",
   "author": "南怀瑾",
   "status": "planned",
+  "rating": 86,
+  "tagIds": [4],
+  "newTags": ["佛学", "注解"],
   "tags": ["佛学", "注解"],
   "shortReview": "先放进待读书架。",
   "whyItMatters": "后面想对照不同版本看。",
@@ -166,7 +169,9 @@ stateDiagram-v2
 说明：
 
 - 文件上传建议走 `multipart/form-data`，文本字段与文件字段同一次提交即可。
-- `tags` 在传输层建议统一为数组，存储层可按实现需要转成字符串或单独关联表。
+- 现有标签建议通过 `tagIds` 多选传入。
+- 新标签建议通过 `newTags` 数组传入，服务端自动创建后再与书籍关联。
+- 返回层仍保留 `tags` 字符串数组，方便前端直接渲染。
 
 ## 页面状态细图
 

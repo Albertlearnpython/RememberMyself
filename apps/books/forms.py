@@ -1,9 +1,25 @@
+import re
+
 from django import forms
 
-from apps.books.models import Book, BookAsset
+from apps.books.models import Book, BookAsset, BookTag
+
+
+TAG_SPLIT_PATTERN = re.compile(r"[\n,，]+")
 
 
 class BookEditorForm(forms.ModelForm):
+    tag_links = forms.ModelMultipleChoiceField(
+        label="已有标签",
+        queryset=BookTag.objects.none(),
+        required=False,
+        widget=forms.CheckboxSelectMultiple(),
+    )
+    new_tags = forms.CharField(
+        label="新增标签",
+        required=False,
+        widget=forms.TextInput(attrs={"placeholder": "例如：养生, 中医, 修身"}),
+    )
     asset_file = forms.FileField(
         label="上传文件",
         required=False,
@@ -37,7 +53,7 @@ class BookEditorForm(forms.ModelForm):
             "cover_image_url",
             "status",
             "rating",
-            "tags",
+            "tag_links",
             "short_review",
             "why_it_matters",
             "long_note",
@@ -54,8 +70,7 @@ class BookEditorForm(forms.ModelForm):
             "publish_year": forms.NumberInput(attrs={"placeholder": "年份"}),
             "cover_image_url": forms.URLInput(attrs={"placeholder": "https://"}),
             "status": forms.Select(),
-            "rating": forms.NumberInput(attrs={"min": 1, "max": 5, "placeholder": "1-5"}),
-            "tags": forms.TextInput(attrs={"placeholder": "例如：哲学, 自我管理, 反思"}),
+            "rating": forms.NumberInput(attrs={"min": 1, "max": 100, "placeholder": "1-100"}),
             "short_review": forms.TextInput(
                 attrs={"placeholder": "一句短评，适合出现在列表卡片里"}
             ),
@@ -75,7 +90,6 @@ class BookEditorForm(forms.ModelForm):
             "cover_image_url": "封面图链接",
             "status": "阅读状态",
             "rating": "评分",
-            "tags": "标签",
             "short_review": "一句短评",
             "why_it_matters": "为什么重要",
             "long_note": "长笔记",
@@ -84,10 +98,31 @@ class BookEditorForm(forms.ModelForm):
             "visibility": "可见性",
         }
 
-    def clean_tags(self):
-        raw_tags = self.cleaned_data.get("tags", "")
-        tags = [item.strip() for item in raw_tags.split(",") if item.strip()]
-        return ", ".join(dict.fromkeys(tags))
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["tag_links"].queryset = BookTag.objects.order_by("name")
+        self.fields["rating"].min_value = 1
+        self.fields["rating"].max_value = 100
+        self.fields["rating"].widget.attrs.update({"min": 1, "max": 100, "placeholder": "1-100"})
+        if self.instance.pk:
+            self.fields["tag_links"].initial = self.instance.tag_links.all()
+
+    def clean_new_tags(self):
+        raw_value = self.cleaned_data.get("new_tags", "")
+        parsed_tags = [
+            item.strip()
+            for item in TAG_SPLIT_PATTERN.split(raw_value)
+            if item.strip()
+        ]
+        deduped_tags = []
+        seen = set()
+        for tag_name in parsed_tags:
+            normalized = tag_name.casefold()
+            if normalized in seen:
+                continue
+            seen.add(normalized)
+            deduped_tags.append(tag_name)
+        return deduped_tags
 
     def clean_asset_file(self):
         asset_file = self.cleaned_data.get("asset_file")
@@ -96,7 +131,25 @@ class BookEditorForm(forms.ModelForm):
         return asset_file
 
     def save(self, commit=True):
-        book = super().save(commit=commit)
+        book = super().save(commit=False)
+        selected_tags = list(self.cleaned_data.get("tag_links") or [])
+        resolved_tags = {tag.name.casefold(): tag for tag in selected_tags}
+
+        for tag_name in self.cleaned_data.get("new_tags", []):
+            normalized = tag_name.casefold()
+            if normalized in resolved_tags:
+                continue
+            existing_tag = BookTag.objects.filter(name__iexact=tag_name).first()
+            if existing_tag is None:
+                existing_tag = BookTag.objects.create(name=tag_name)
+            resolved_tags[normalized] = existing_tag
+
+        if commit:
+            book.save()
+            book.tag_links.set(resolved_tags.values())
+        else:
+            self.save_m2m = lambda: book.tag_links.set(resolved_tags.values())
+
         asset_file = self.cleaned_data.get("asset_file")
         if commit and asset_file:
             BookAsset.objects.create(

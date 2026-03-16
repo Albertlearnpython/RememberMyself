@@ -17,6 +17,19 @@ class BookQuerySet(models.QuerySet):
         return self.filter(visibility=Book.Visibility.PUBLIC)
 
 
+class BookTag(models.Model):
+    name = models.CharField("标签名", max_length=50, unique=True)
+    created_at = models.DateTimeField("创建时间", auto_now_add=True)
+
+    class Meta:
+        ordering = ["name"]
+        verbose_name = "书籍标签"
+        verbose_name_plural = "书籍标签"
+
+    def __str__(self):
+        return self.name
+
+
 class Book(models.Model):
     class Status(models.TextChoices):
         PLANNED = "planned", "想读"
@@ -47,9 +60,14 @@ class Book(models.Model):
         "评分",
         blank=True,
         null=True,
-        validators=[MinValueValidator(1), MaxValueValidator(5)],
+        validators=[MinValueValidator(1), MaxValueValidator(100)],
     )
-    tags = models.CharField("标签", max_length=255, blank=True)
+    tag_links = models.ManyToManyField(
+        BookTag,
+        blank=True,
+        related_name="books",
+        verbose_name="标签",
+    )
     short_review = models.CharField("一句短评", max_length=240, blank=True)
     why_it_matters = models.TextField("为什么重要", blank=True)
     long_note = models.TextField("长笔记", blank=True)
@@ -76,7 +94,7 @@ class Book(models.Model):
 
     @property
     def tag_list(self):
-        return [item.strip() for item in self.tags.split(",") if item.strip()]
+        return [tag.name for tag in self.tag_links.all()]
 
     def is_visible_to(self, user):
         if getattr(user, "is_staff", False) or getattr(user, "is_superuser", False):

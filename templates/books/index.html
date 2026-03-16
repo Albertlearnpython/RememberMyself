@@ -142,7 +142,7 @@
                     <div><dt>译者</dt><dd>{{ selected_book.translator|default:"-" }}</dd></div>
                     <div><dt>出版</dt><dd>{{ selected_book.publisher|default:"-" }}{% if selected_book.publish_year %} · {{ selected_book.publish_year }}{% endif %}</dd></div>
                     <div><dt>状态</dt><dd>{{ selected_book.get_status_display }}</dd></div>
-                    <div><dt>评分</dt><dd>{% if selected_book.rating %}{{ selected_book.rating }} / 5{% else %}-{% endif %}</dd></div>
+                    <div><dt>评分</dt><dd>{% if selected_book.rating %}{{ selected_book.rating }} / 100{% else %}-{% endif %}</dd></div>
                     <div><dt>标签</dt><dd>{% if selected_book.tag_list %}{{ selected_book.tag_list|join:" · " }}{% else %}-{% endif %}</dd></div>
                 </dl>
 

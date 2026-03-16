@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from apps.books.models import Book, BookAsset
+from apps.books.models import Book, BookAsset, BookTag
 
 
 class BookAssetInline(admin.TabularInline):
@@ -19,8 +19,14 @@ class BookAdmin(admin.ModelAdmin):
         "updated_at",
     )
     list_filter = ("status", "visibility", "created_at", "updated_at")
-    search_fields = ("title", "author", "publisher", "tags", "short_review")
+    search_fields = ("title", "author", "publisher", "tag_links__name", "short_review")
     inlines = [BookAssetInline]
+
+
+@admin.register(BookTag)
+class BookTagAdmin(admin.ModelAdmin):
+    list_display = ("name", "created_at")
+    search_fields = ("name",)
 
 
 @admin.register(BookAsset)

@@ -119,7 +119,7 @@ def _render_books_page(request, selected_id=None, form=None, editor_mode=None):
             | Q(subtitle__icontains=q)
             | Q(author__icontains=q)
             | Q(publisher__icontains=q)
-            | Q(tags__icontains=q)
+            | Q(tag_links__name__icontains=q)
             | Q(short_review__icontains=q)
             | Q(why_it_matters__icontains=q)
             | Q(long_note__icontains=q)
@@ -127,9 +127,9 @@ def _render_books_page(request, selected_id=None, form=None, editor_mode=None):
     if status and status in {choice[0] for choice in Book.Status.choices}:
         books_qs = books_qs.filter(status=status)
     if tag:
-        books_qs = books_qs.filter(tags__icontains=tag)
+        books_qs = books_qs.filter(tag_links__name=tag)
 
-    books = list(books_qs.prefetch_related("assets"))
+    books = list(books_qs.distinct().prefetch_related("assets", "tag_links"))
     selected_book = None
     if selected_id is not None:
         selected_book = next((book for book in books if book.pk == selected_id), None)

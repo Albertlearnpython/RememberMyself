@@ -7,7 +7,7 @@ from django.test import TestCase
 from django.test.utils import override_settings
 from django.urls import reverse
 
-from apps.books.models import Book, BookAsset
+from apps.books.models import Book, BookAsset, BookTag
 
 
 User = get_user_model()
@@ -80,8 +80,9 @@ class BookAssetTests(TestCase):
             status=Book.Status.READING,
             visibility=Book.Visibility.PUBLIC,
         )
+        self.shared_tag = BookTag.objects.create(name="养生")
 
-    def test_create_book_with_epub_upload_creates_asset(self):
+    def test_create_book_with_upload_creates_asset_and_shared_tags(self):
         self.client.login(username="asset_admin", password="pass123456")
 
         response = self.client.post(
@@ -95,8 +96,9 @@ class BookAssetTests(TestCase):
                 "publish_year": "",
                 "cover_image_url": "",
                 "status": Book.Status.PLANNED,
-                "rating": "",
-                "tags": "",
+                "rating": "88",
+                "tag_links": [self.shared_tag.pk],
+                "new_tags": "内经, 养生",
                 "short_review": "",
                 "why_it_matters": "",
                 "long_note": "",
@@ -117,6 +119,57 @@ class BookAssetTests(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(BookAsset.objects.count(), 1)
         self.assertEqual(BookAsset.objects.first().file_extension, ".epub")
+        book = Book.objects.get(title="上传测试书")
+        self.assertEqual(book.rating, 88)
+        self.assertCountEqual(book.tag_list, ["养生", "内经"])
+        self.assertEqual(BookTag.objects.filter(name="养生").count(), 1)
+        self.assertEqual(BookTag.objects.count(), 2)
+
+    def test_books_page_can_filter_by_shared_tag(self):
+        tagged_book = Book.objects.create(
+            title="养生书",
+            status=Book.Status.READING,
+            visibility=Book.Visibility.PUBLIC,
+        )
+        tagged_book.tag_links.add(self.shared_tag)
+        Book.objects.create(
+            title="未打标签的书",
+            status=Book.Status.PLANNED,
+            visibility=Book.Visibility.PUBLIC,
+        )
+
+        response = self.client.get(reverse("books:index"), {"tag": "养生"})
+
+        self.assertContains(response, "养生书")
+        self.assertNotContains(response, "未打标签的书")
+
+    def test_hundred_point_rating_rejects_out_of_range_value(self):
+        self.client.login(username="asset_admin", password="pass123456")
+
+        response = self.client.post(
+            reverse("books:create"),
+            data={
+                "title": "评分超限测试",
+                "subtitle": "",
+                "author": "",
+                "translator": "",
+                "publisher": "",
+                "publish_year": "",
+                "cover_image_url": "",
+                "status": Book.Status.PLANNED,
+                "rating": "101",
+                "short_review": "",
+                "why_it_matters": "",
+                "long_note": "",
+                "reading_started_at": "",
+                "reading_finished_at": "",
+                "visibility": Book.Visibility.PUBLIC,
+            },
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "小于或等于100")
+        self.assertFalse(Book.objects.filter(title="评分超限测试").exists())
 
     def test_detail_page_only_shows_download_action_for_asset(self):
         self.client.login(username="asset_admin", password="pass123456")

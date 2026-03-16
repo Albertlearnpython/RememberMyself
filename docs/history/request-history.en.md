@@ -195,6 +195,37 @@ Completed for this round.
 
 ### Request
 
+Continue refining the Favorite Books module:
+
+- change the score system from 5-point to 100-point
+- support multi-select tags
+- make tags reusable shared entities instead of per-book comma strings
+- allow creating a new tag directly during editing when existing tags do not fit
+- update the GitHub documentation at the same time
+
+### Decisions
+
+- Existing ratings are migrated proportionally from the old 5-point scale into the new 100-point scale
+- A shared tag model is introduced and books now relate to tags through a many-to-many structure
+- The editor uses a two-part tag input: select existing tags and create new tags
+- Newly entered tags are created automatically and immediately reusable by later books
+- Books design and implementation docs are updated to reflect the new rating and tag rules
+
+### Affected Pages
+
+- Books
+- Book editor drawer
+- Tag filtering and shared-tag system
+- Request history
+
+### Status
+
+Implemented and documented.
+
+## 2026-03-16 - Round 11
+
+### Request
+
 Reposition the Favorite Books module:
 
 - remove in-browser reading

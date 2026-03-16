@@ -12,14 +12,15 @@
 
 ## 数据对象划分
 
-建议至少拆成两个核心对象：
+建议至少拆成三个核心对象：
 
 1. `Book`
-2. `BookAsset`
+2. `BookTag`
+3. `BookAsset`
 
 如果以后需要扩展，还可以再加：
 
-3. `BookReadingLog`
+4. `BookReadingLog`
 
 ## 一、Book 字段
 
@@ -37,8 +38,8 @@
 | `cover_image_url` | 封面图 | string | 否 | 是 | editor+ |
 | `cover_tone` | 封面主色调 | string | 否 | 否 | editor+ |
 | `status` | 阅读状态 | enum | 是 | 是 | editor+ |
-| `rating` | 主观评分 | number | 否 | 可选 | editor+ |
-| `tags` | 标签 | string[] | 否 | 是 | editor+ |
+| `rating` | 主观评分（1-100） | number | 否 | 可选 | editor+ |
+| `tags` | 标签名数组（来自共享标签库） | string[] | 否 | 是 | editor+ |
 | `short_review` | 一句短评 | string | 否 | 是 | editor+ |
 | `long_note` | 长笔记 | markdown/text | 否 | 登录后/公开可配置 | editor+ |
 | `why_it_matters` | 为什么重要 | text | 否 | 是 | editor+ |
@@ -50,7 +51,21 @@
 | `created_at` | 创建时间 | datetime | 是 | 否 | 系统 |
 | `updated_at` | 更新时间 | datetime | 是 | 否 | 系统 |
 
-## 二、BookAsset 字段
+## 二、BookTag 字段
+
+| 字段名 | 含义 | 类型 | 必填 | 前台展示 | 编辑角色 |
+| --- | --- | --- | --- | --- | --- |
+| `id` | 标签唯一标识 | string/uuid | 是 | 否 | 系统 |
+| `name` | 标签名 | string | 是 | 是 | editor+ |
+| `created_at` | 创建时间 | datetime | 是 | 否 | 系统 |
+
+补充说明：
+
+- 标签应当是全站书籍模块里的共享对象，不是每本书自己的私有字符串。
+- 同一个标签可以被多本书复用，例如 `养生` 可以同时挂在多本书上。
+- 如果编辑时输入了不存在的新标签，系统应自动创建并加入当前书籍。
+
+## 三、BookAsset 字段
 
 | 字段名 | 含义 | 类型 | 必填 | 前台展示 | 编辑角色 |
 | --- | --- | --- | --- | --- | --- |
@@ -66,7 +81,7 @@
 | `created_at` | 上传时间 | datetime | 是 | 否 | 系统 |
 | `updated_at` | 更新时间 | datetime | 是 | 否 | 系统 |
 
-## 三、BookReadingLog 字段
+## 四、BookReadingLog 字段
 
 这个对象不是当前第一优先级，但建议提前留概念。
 
@@ -141,6 +156,22 @@
 
 - `short_review` 用于列表和摘要
 - `long_note` 用于详情和深层阅读记录
+
+### 为什么标签要改成共享标签库
+
+因为标签不仅要“能显示”，还要“能复用和筛选”。
+
+如果继续把标签存成逗号文本：
+
+- 很难保证 `养生` 和 ` 养生 ` 被视为同一个标签
+- 很难做多选
+- 很难稳定地支持“新建一个标签并给多本书共用”
+
+改成共享标签对象后：
+
+- 同名标签天然复用
+- 书籍可以稳定多选多个标签
+- 新标签创建后可以立刻被后续书籍继续使用
 
 ### 为什么 `visibility` 要放在书和文件两个层面
 
