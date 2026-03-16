@@ -283,6 +283,35 @@ This round requires:
 
 Completed for this round.
 
+## 2026-03-16 - Round 12
+
+### Request
+
+Continue refining the books module:
+
+- stop rendering all existing tags as a large always-open block in the editor
+- try to fill missing covers from WeRead first
+- auto-generate short reviews where they are still empty
+- prefill any other stable metadata that can be found reliably
+
+### Decisions
+
+- the editor drawer now uses a collapsed, searchable multi-select for existing tags
+- public WeRead search results are used to fill authors, translators, publishers, and covers where available
+- missing short reviews are batch-generated for the imported books
+- uncertain matches are handled conservatively to avoid overwriting books with obviously wrong metadata
+
+### Affected Pages
+
+- Favorite Books editor drawer
+- Online book data
+- Books visual spec
+- Books implementation spec
+
+### Status
+
+Completed for this round.
+
 ## 2026-03-16 - Round 7
 
 ### Request

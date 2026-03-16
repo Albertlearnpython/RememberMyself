@@ -58,17 +58,44 @@
     </div>
 
     <div class="drawer-grid drawer-grid--two">
-        <div class="field">
-            <span class="field__label">{{ form.tag_links.label }}</span>
-            <div class="tag-choice-grid">
-                {% for checkbox in form.tag_links %}
-                    <label class="tag-choice tag-choice--tone-{{ checkbox.choice_label|tag_tone }}">
-                        {{ checkbox.tag }}
-                        <span>{{ checkbox.choice_label }}</span>
-                    </label>
-                {% empty %}
-                    <span class="field__hint">当前还没有共用标签，你可以直接在右侧新建。</span>
-                {% endfor %}
+        <div class="field field--tag-picker" data-tag-picker>
+            <div class="field__label-row">
+                <span class="field__label">{{ form.tag_links.label }}</span>
+                <button
+                    class="tag-picker__toggle"
+                    type="button"
+                    data-tag-picker-toggle
+                    aria-expanded="false"
+                >
+                    <span class="tag-picker__summary" data-tag-picker-summary>选择已有标签</span>
+                    <span class="tag-picker__toggle-hint" data-tag-picker-toggle-hint>展开</span>
+                </button>
+            </div>
+            <span class="field__hint">已有标签收进下拉区，可搜索、可多选，不会把抽屉撑得太臃肿。</span>
+            <div class="tag-picker__panel" data-tag-picker-panel hidden>
+                <div class="tag-picker__toolbar">
+                    <input
+                        class="tag-picker__search"
+                        type="search"
+                        placeholder="搜索已有标签"
+                        data-tag-picker-search
+                    >
+                    <button class="tag-picker__clear" type="button" data-tag-picker-clear>清空已选</button>
+                </div>
+                <div class="tag-choice-grid tag-choice-grid--picker">
+                    {% for checkbox in form.tag_links %}
+                        <label
+                            class="tag-choice tag-choice--compact tag-choice--tone-{{ checkbox.choice_label|tag_tone }}"
+                            data-tag-choice
+                            data-tag-choice-label="{{ checkbox.choice_label }}"
+                        >
+                            {{ checkbox.tag }}
+                            <span>{{ checkbox.choice_label }}</span>
+                        </label>
+                    {% empty %}
+                        <span class="field__hint">当前还没有共用标签，你可以直接在右侧新建。</span>
+                    {% endfor %}
+                </div>
             </div>
             {% for error in form.tag_links.errors %}<span class="field__error">{{ error }}</span>{% endfor %}
         </div>

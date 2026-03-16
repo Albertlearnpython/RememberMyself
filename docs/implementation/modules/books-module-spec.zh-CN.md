@@ -64,6 +64,8 @@ stateDiagram-v2
 - 列表、详情、抽屉三层同时存在
 - `ProtectedAssetPanel` 必须支持 `locked / ready / error`
 - 手机端详情改全屏，不保留三栏
+- `BookEditorDrawer` 中的 `已有标签` 改为折叠式可搜索多选器，避免标签数量增多后把抽屉撑满
+- 标签选择器应支持三类状态：`collapsed / expanded / filtering`
 
 ## 接口字段级示例
 
