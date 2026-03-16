@@ -1101,6 +1101,10 @@ button {
     padding: 24px;
 }
 
+.metadata-modal[hidden] {
+    display: none !important;
+}
+
 .metadata-modal__backdrop {
     position: absolute;
     inset: 0;
