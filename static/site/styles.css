@@ -295,6 +295,13 @@ button {
     background: rgba(20, 31, 50, 0.92);
 }
 
+.button--muted {
+    border-color: rgba(167, 180, 199, 0.14);
+    background: rgba(20, 31, 50, 0.6);
+    color: var(--text-muted);
+    box-shadow: none;
+}
+
 .button--danger {
     border-color: rgba(122, 98, 72, 0.24);
     color: var(--bronze);

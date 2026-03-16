@@ -182,6 +182,7 @@ if (metadataRoot && metadataModal) {
     const closeButtons = metadataModal.querySelectorAll("[data-metadata-modal-close]");
     const csrfInput = form?.querySelector("input[name='csrfmiddlewaretoken']");
     const titleInput = form?.querySelector("[name='title']");
+    const defaultApplyLabel = "确认填入";
     let currentPreview = null;
 
     const setPreviewLoading = (loading) => {
@@ -197,7 +198,12 @@ if (metadataRoot && metadataModal) {
             return;
         }
         applyTrigger.disabled = loading;
-        applyTrigger.textContent = loading ? "填入中…" : "确认填入";
+        if (loading) {
+            applyTrigger.textContent = "填入中…";
+            applyTrigger.classList.remove("button--muted");
+            return;
+        }
+        syncApplyButtonState();
     };
 
     const openModal = () => {
@@ -223,7 +229,16 @@ if (metadataRoot && metadataModal) {
         );
 
     const syncApplyButtonState = () => {
-        applyTrigger.disabled = getSelectedFieldNames().length === 0;
+        if (!applyTrigger) {
+            return;
+        }
+        const selectedCount = getSelectedFieldNames().length;
+        applyTrigger.disabled = false;
+        applyTrigger.textContent =
+            selectedCount > 0
+                ? `${defaultApplyLabel}（${selectedCount}）`
+                : `${defaultApplyLabel}（先勾选字段）`;
+        applyTrigger.classList.toggle("button--muted", selectedCount === 0);
     };
 
     const patchFormValues = (values) => {
