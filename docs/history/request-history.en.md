@@ -397,3 +397,33 @@ Continue with component-level implementation planning, including:
 ### Status
 
 Completed for this round.
+
+## 2026-03-16 - Round 11
+
+### Request
+
+Continue refining the books module:
+
+- add a `word count (in ten-thousands)` field with decimal support
+- remove the `paused` status
+- make tags render in different colors
+- sync the related design and implementation docs
+
+### Decisions
+
+- a new `word_count` field is added to the book model with decimal support
+- the list cards, detail panel, and editor drawer now expose the word-count field
+- the `paused` status is removed, and old data is migrated back to `planned`
+- tag colors are now derived from the tag name so the same tag keeps the same tone site-wide
+- the Chinese design docs, English overview, and implementation spec are updated together
+
+### Affected Pages
+
+- Favorite Books
+- Book editor drawer
+- Books design docs
+- Books implementation docs
+
+### Status
+
+Completed for this round.

@@ -8,7 +8,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 
 from apps.books.forms import BookEditorForm
-from apps.books.models import Book, BookAsset
+from apps.books.models import Book, BookAsset, BookTag
 
 
 def index(request):
@@ -108,7 +108,8 @@ def delete_asset(request, asset_id):
 
 
 def _render_books_page(request, selected_id=None, form=None, editor_mode=None):
-    books_qs = Book.objects.visible_to_user(request.user)
+    visible_books_qs = Book.objects.visible_to_user(request.user)
+    books_qs = visible_books_qs
     q = request.GET.get("q", "").strip()
     status = request.GET.get("status", "").strip()
     tag = request.GET.get("tag", "").strip()
@@ -152,7 +153,9 @@ def _render_books_page(request, selected_id=None, form=None, editor_mode=None):
         elif editor_mode == "create":
             form = BookEditorForm()
 
-    available_tags = sorted({tag_item for book in books for tag_item in book.tag_list})
+    available_tags = list(
+        BookTag.objects.filter(books__in=visible_books_qs).distinct().order_by("name")
+    )
     asset_rows = []
     if selected_book is not None:
         for asset in selected_book.assets.all():

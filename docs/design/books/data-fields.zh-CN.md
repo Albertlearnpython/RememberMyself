@@ -39,6 +39,7 @@
 | `cover_tone` | 封面主色调 | string | 否 | 否 | editor+ |
 | `status` | 阅读状态 | enum | 是 | 是 | editor+ |
 | `rating` | 主观评分（1-100） | number | 否 | 可选 | editor+ |
+| `word_count` | 字数（单位：万，支持两位小数） | decimal | 否 | 可选 | editor+ |
 | `tags` | 标签名数组（来自共享标签库） | string[] | 否 | 是 | editor+ |
 | `short_review` | 一句短评 | string | 否 | 是 | editor+ |
 | `long_note` | 长笔记 | markdown/text | 否 | 登录后/公开可配置 | editor+ |
@@ -64,6 +65,7 @@
 - 标签应当是全站书籍模块里的共享对象，不是每本书自己的私有字符串。
 - 同一个标签可以被多本书复用，例如 `养生` 可以同时挂在多本书上。
 - 如果编辑时输入了不存在的新标签，系统应自动创建并加入当前书籍。
+- 标签颜色不单独存库，前端根据标签名做稳定映射，让同名标签在全站保持同一色调。
 
 ## 三、BookAsset 字段
 
@@ -99,7 +101,6 @@
 
 - `planned`
 - `reading`
-- `paused`
 - `finished`
 - `revisiting`
 
@@ -125,6 +126,7 @@
 - `title`
 - `author`
 - `status`
+- `word_count`
 - `tags`
 - `short_review`
 

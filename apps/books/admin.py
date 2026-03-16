@@ -16,6 +16,7 @@ class BookAdmin(admin.ModelAdmin):
         "status",
         "visibility",
         "rating",
+        "word_count",
         "updated_at",
     )
     list_filter = ("status", "visibility", "created_at", "updated_at")

@@ -53,6 +53,7 @@ class BookEditorForm(forms.ModelForm):
             "cover_image_url",
             "status",
             "rating",
+            "word_count",
             "tag_links",
             "short_review",
             "why_it_matters",
@@ -71,6 +72,9 @@ class BookEditorForm(forms.ModelForm):
             "cover_image_url": forms.URLInput(attrs={"placeholder": "https://"}),
             "status": forms.Select(),
             "rating": forms.NumberInput(attrs={"min": 1, "max": 100, "placeholder": "1-100"}),
+            "word_count": forms.NumberInput(
+                attrs={"min": "0.01", "step": "0.01", "placeholder": "例如：8.5"}
+            ),
             "short_review": forms.TextInput(
                 attrs={"placeholder": "一句短评，适合出现在列表卡片里"}
             ),
@@ -90,6 +94,7 @@ class BookEditorForm(forms.ModelForm):
             "cover_image_url": "封面图链接",
             "status": "阅读状态",
             "rating": "评分",
+            "word_count": "字数（万字）",
             "short_review": "一句短评",
             "why_it_matters": "为什么重要",
             "long_note": "长笔记",
@@ -104,6 +109,9 @@ class BookEditorForm(forms.ModelForm):
         self.fields["rating"].min_value = 1
         self.fields["rating"].max_value = 100
         self.fields["rating"].widget.attrs.update({"min": 1, "max": 100, "placeholder": "1-100"})
+        self.fields["word_count"].widget.attrs.update(
+            {"min": "0.01", "step": "0.01", "placeholder": "例如：8.5"}
+        )
         if self.instance.pk:
             self.fields["tag_links"].initial = self.instance.tag_links.all()
 

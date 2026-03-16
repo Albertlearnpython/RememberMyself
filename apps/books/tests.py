@@ -1,5 +1,6 @@
 import shutil
 import tempfile
+from decimal import Decimal
 
 from django.contrib.auth import get_user_model
 from django.core.files.uploadedfile import SimpleUploadedFile
@@ -27,7 +28,7 @@ class BooksVisibilityTests(TestCase):
         )
         self.private_book = Book.objects.create(
             title="私密书籍",
-            status=Book.Status.PAUSED,
+            status=Book.Status.FINISHED,
             visibility=Book.Visibility.PRIVATE,
         )
         self.user = User.objects.create_user(username="viewer", password="pass123456")
@@ -97,6 +98,7 @@ class BookAssetTests(TestCase):
                 "cover_image_url": "",
                 "status": Book.Status.PLANNED,
                 "rating": "88",
+                "word_count": "12.5",
                 "tag_links": [self.shared_tag.pk],
                 "new_tags": "内经, 养生",
                 "short_review": "",
@@ -121,6 +123,7 @@ class BookAssetTests(TestCase):
         self.assertEqual(BookAsset.objects.first().file_extension, ".epub")
         book = Book.objects.get(title="上传测试书")
         self.assertEqual(book.rating, 88)
+        self.assertEqual(book.word_count, Decimal("12.50"))
         self.assertCountEqual(book.tag_list, ["养生", "内经"])
         self.assertEqual(BookTag.objects.filter(name="养生").count(), 1)
         self.assertEqual(BookTag.objects.count(), 2)
@@ -170,6 +173,9 @@ class BookAssetTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "小于或等于100")
         self.assertFalse(Book.objects.filter(title="评分超限测试").exists())
+
+    def test_status_choices_no_longer_include_paused(self):
+        self.assertNotIn("paused", dict(Book.Status.choices))
 
     def test_detail_page_only_shows_download_action_for_asset(self):
         self.client.login(username="asset_admin", password="pass123456")

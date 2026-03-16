@@ -78,7 +78,7 @@ flowchart LR
 | - rating           | - cover                                                   |
 | - format           | - title                                                   |
 | - year             | - author                                                  |
-|                    | - status / tags                                           |
+|                    | - status / word count / tags                              |
 |                    | - short note                                              |
 +--------------------+-----------------------------+-----------------------------+
 | Detail panel                                    | Protected file zone         |
@@ -142,13 +142,13 @@ Each item should show:
 - title
 - author
 - current reading state
+- word count
 - one-line note
 
 Recommended states:
 
 - planned
 - reading
-- paused
 - finished
 - revisiting
 
@@ -159,8 +159,9 @@ This is where the page becomes personal.
 Suggested content:
 
 - title and author
-- long note
+- word count and rating
 - tags
+- long note
 - read dates
 - emotional note: why this book matters
 
@@ -176,7 +177,6 @@ Anonymous state:
 
 Logged-in viewer state:
 
-- online reading
 - download
 - file format info
 

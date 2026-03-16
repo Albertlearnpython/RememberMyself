@@ -80,6 +80,7 @@ stateDiagram-v2
       "author": "马可·奥勒留",
       "status": "reading",
       "rating": 92,
+      "wordCount": 8.5,
       "tags": ["哲学", "自我管理", "反思"],
       "shortReview": "适合反复拿起来的书。",
       "coverImageUrl": "https://example.com/book-cover.jpg",
@@ -100,6 +101,7 @@ stateDiagram-v2
 | `id` | `number` | `12` | 书籍主键 |
 | `status` | `string` | `reading` | 阅读状态，前端映射状态色 |
 | `rating` | `number \| null` | `92` | 100 分制评分，没有评分时返回 `null` |
+| `wordCount` | `number \| null` | `8.5` | 字数，单位万，支持小数；列表卡可直接显示为 `8.5 万字` |
 | `tags` | `string[]` | `["哲学","自我管理"]` | 标签数组，来自共享标签库，列表页通常只展示前 2 到 3 个 |
 | `shortReview` | `string` | `适合反复拿起来的书。` | 列表卡短评 |
 | `detailPath` | `string` | `/books/12` | 前端可直接跳转的详情路径 |
@@ -120,6 +122,7 @@ stateDiagram-v2
     "publishYear": 2016,
     "status": "reading",
     "rating": 92,
+    "wordCount": 8.5,
     "tags": ["哲学", "自我管理", "反思"],
     "whyItMatters": "它帮人把情绪从外部拉回内部。",
     "longNote": "这里放较长的阅读笔记、摘录和回想。",
@@ -144,6 +147,7 @@ stateDiagram-v2
 | --- | --- | --- | --- |
 | `whyItMatters` | `string` | `它帮人把情绪从外部拉回内部。` | 详情页最需要突出显示的段落 |
 | `longNote` | `string` | `这里放较长的阅读笔记...` | 长笔记正文，前端按段落渲染 |
+| `wordCount` | `number \| null` | `8.5` | 详情区元数据字段，显示时带单位 `万字` |
 | `visibility` | `string` | `public` | 决定书籍整体可见范围 |
 | `assets[].assetType` | `string` | `ebook` | 文件类型，控制图标和归档呈现 |
 | `assets[].downloadEnabled` | `boolean` | `true` | 是否允许直接下载 |
@@ -157,6 +161,7 @@ stateDiagram-v2
   "author": "南怀瑾",
   "status": "planned",
   "rating": 86,
+  "wordCount": 6.8,
   "tagIds": [4],
   "newTags": ["佛学", "注解"],
   "tags": ["佛学", "注解"],
@@ -172,6 +177,8 @@ stateDiagram-v2
 - 现有标签建议通过 `tagIds` 多选传入。
 - 新标签建议通过 `newTags` 数组传入，服务端自动创建后再与书籍关联。
 - 返回层仍保留 `tags` 字符串数组，方便前端直接渲染。
+- 标签颜色前端按标签名做稳定映射，不要求接口额外返回颜色字段。
+- `paused` 状态已废弃；旧数据如存在，应在迁移中回写到 `planned`。
 
 ## 页面状态细图
 

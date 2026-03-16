@@ -1,3 +1,4 @@
+{% load books_tags %}
 <div class="drawer-section">
     <div class="drawer-grid drawer-grid--two">
         <label class="field">
@@ -43,17 +44,25 @@
         </label>
     </div>
 
-    <label class="field">
-        <span class="field__label">{{ form.cover_image_url.label }}</span>
-        {{ form.cover_image_url }}
-    </label>
+    <div class="drawer-grid drawer-grid--two">
+        <label class="field">
+            <span class="field__label">{{ form.word_count.label }}</span>
+            {{ form.word_count }}
+            <span class="field__hint">单位是万字，支持小数，例如 8.5。</span>
+            {% for error in form.word_count.errors %}<span class="field__error">{{ error }}</span>{% endfor %}
+        </label>
+        <label class="field">
+            <span class="field__label">{{ form.cover_image_url.label }}</span>
+            {{ form.cover_image_url }}
+        </label>
+    </div>
 
     <div class="drawer-grid drawer-grid--two">
         <div class="field">
             <span class="field__label">{{ form.tag_links.label }}</span>
             <div class="tag-choice-grid">
                 {% for checkbox in form.tag_links %}
-                    <label class="tag-choice">
+                    <label class="tag-choice tag-choice--tone-{{ checkbox.choice_label|tag_tone }}">
                         {{ checkbox.tag }}
                         <span>{{ checkbox.choice_label }}</span>
                     </label>

@@ -1,6 +1,7 @@
-import os
-from pathlib import Path
 import mimetypes
+import os
+from decimal import Decimal
+from pathlib import Path
 
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
@@ -34,7 +35,6 @@ class Book(models.Model):
     class Status(models.TextChoices):
         PLANNED = "planned", "想读"
         READING = "reading", "在读"
-        PAUSED = "paused", "暂停"
         FINISHED = "finished", "读完"
         REVISITING = "revisiting", "重读"
 
@@ -61,6 +61,14 @@ class Book(models.Model):
         blank=True,
         null=True,
         validators=[MinValueValidator(1), MaxValueValidator(100)],
+    )
+    word_count = models.DecimalField(
+        "字数（万字）",
+        max_digits=6,
+        decimal_places=2,
+        blank=True,
+        null=True,
+        validators=[MinValueValidator(Decimal("0.01"))],
     )
     tag_links = models.ManyToManyField(
         BookTag,
@@ -95,6 +103,13 @@ class Book(models.Model):
     @property
     def tag_list(self):
         return [tag.name for tag in self.tag_links.all()]
+
+    @property
+    def formatted_word_count(self):
+        if self.word_count is None:
+            return ""
+        text = format(self.word_count, "f").rstrip("0").rstrip(".")
+        return f"{text} 万字"
 
     def is_visible_to(self, user):
         if getattr(user, "is_staff", False) or getattr(user, "is_superuser", False):
