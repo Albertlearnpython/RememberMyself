@@ -48,6 +48,7 @@ docs/
 - [收藏书籍字段设计（中文）](./design/books/data-fields.zh-CN.md)
 - [收藏书籍交互与手机端说明（中文）](./design/books/interaction-flow.zh-CN.md)
 - [收藏书籍最终视觉稿说明（中文）](./design/books/final-visual-spec.zh-CN.md)
+- [收藏书籍外部信息补全设计（中文）](./design/books/metadata-enrichment.zh-CN.md)
 - [Books Design Overview (English)](./design/books/overview.en.md)
 
 ### 喜欢的美食

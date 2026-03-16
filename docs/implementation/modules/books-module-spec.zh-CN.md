@@ -15,7 +15,9 @@ BooksPage
 │  └─ BookCard
 ├─ BookDetailPanel
 ├─ ProtectedAssetPanel
-└─ BookEditorDrawer
+├─ BookEditorDrawer
+├─ MetadataPreviewModal
+└─ FloatingToast
 ```
 
 ## 组件职责
@@ -30,6 +32,8 @@ BooksPage
 | `BookDetailPanel` | 详情信息与笔记 | `book` |
 | `ProtectedAssetPanel` | 文件归档与下载权限门 | `assets`, `session` |
 | `BookEditorDrawer` | 新增/编辑书籍 | `mode`, `initialValue` |
+| `MetadataPreviewModal` | 展示外部来源候选信息与字段差异 | `provider`, `candidate`, `fieldDiffs` |
+| `FloatingToast` | 承载轻提示反馈 | `message`, `tone`, `durationMs` |
 
 ## 接口草案
 
@@ -42,6 +46,8 @@ BooksPage
 | `DELETE` | `/api/books/:id` | 删除书籍 |
 | `POST` | `/api/books/:id/assets` | 上传资源文件 |
 | `GET` | `/api/books/:id/assets` | 获取资源列表 |
+| `POST` | `/api/books/:id/metadata-preview` | 获取外部来源书目信息预览 |
+| `POST` | `/api/books/:id/metadata-apply` | 应用已确认的字段覆盖 |
 
 ## 状态机
 
@@ -66,6 +72,8 @@ stateDiagram-v2
 - 手机端详情改全屏，不保留三栏
 - `BookEditorDrawer` 中的 `已有标签` 改为折叠式可搜索多选器，避免标签数量增多后把抽屉撑满
 - 标签选择器应支持三类状态：`collapsed / expanded / filtering`
+- 外部信息补全必须严格区分 `preview` 和 `apply` 两步，不允许一步直写
+- 补全来源统一通过 `provider` 字段切换：`weread / douban / openlibrary`
 
 ## 接口字段级示例
 
@@ -181,6 +189,83 @@ stateDiagram-v2
 - 返回层仍保留 `tags` 字符串数组，方便前端直接渲染。
 - 标签颜色前端按标签名做稳定映射，不要求接口额外返回颜色字段。
 - `paused` 状态已废弃；旧数据如存在，应在迁移中回写到 `planned`。
+
+### `POST /api/books/:id/metadata-preview`
+
+```json
+{
+  "provider": "weread",
+  "query": "苏菲的世界"
+}
+```
+
+```json
+{
+  "success": true,
+  "status": "found",
+  "previewToken": "meta_prev_01JXYZ",
+  "provider": {
+    "id": "weread",
+    "label": "微信读书"
+  },
+  "candidate": {
+    "sourceId": "703157",
+    "title": "苏菲的世界",
+    "author": "乔斯坦·贾德",
+    "translator": "萧宝森",
+    "publisher": "作家出版社",
+    "coverImageUrl": "https://cdn.weread.qq.com/..."
+  },
+  "fields": [
+    {
+      "name": "cover_image_url",
+      "label": "封面图链接",
+      "current": "",
+      "incoming": "https://cdn.weread.qq.com/...",
+      "changed": true,
+      "defaultSelected": true
+    },
+    {
+      "name": "author",
+      "label": "作者",
+      "current": "",
+      "incoming": "乔斯坦·贾德",
+      "changed": true,
+      "defaultSelected": true
+    }
+  ]
+}
+```
+
+### `POST /api/books/:id/metadata-apply`
+
+```json
+{
+  "provider": "weread",
+  "previewToken": "meta_prev_01JXYZ",
+  "fields": [
+    "cover_image_url",
+    "author",
+    "translator",
+    "publisher",
+    "short_review"
+  ]
+}
+```
+
+```json
+{
+  "success": true,
+  "message": "已更新 5 个字段",
+  "updatedFields": [
+    "cover_image_url",
+    "author",
+    "translator",
+    "publisher",
+    "short_review"
+  ]
+}
+```
 
 ## 页面状态细图
 

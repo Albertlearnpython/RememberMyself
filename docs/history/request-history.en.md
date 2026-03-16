@@ -287,6 +287,39 @@ Completed for this round.
 
 ### Request
 
+Continue discussing the external metadata enrichment feature for books, without implementing code yet, and define:
+
+- the drawer entry placement
+- the preview modal structure
+- the `preview / apply` API draft
+- the field overwrite rules
+- a provider dropdown instead of a single source
+
+### Decisions
+
+- the main entry lives inside the book editor drawer, not on the list page
+- the entry is composed of a provider dropdown plus a preview button
+- phase one supports `WeRead / Douban / Open Library`
+- actual writes must be split into `metadata-preview` and `metadata-apply`
+- not-found cases use a lightweight 3-second toast instead of a large modal
+- field overwrite follows a cautious flow: preview first, checkbox selection second, apply last
+- a dedicated Chinese design doc is added for this feature
+
+### Affected Pages
+
+- Favorite Books editor drawer
+- Books interaction spec
+- Books implementation spec
+- Books request history
+
+### Status
+
+Completed for this round.
+
+## 2026-03-16 - Round 13
+
+### Request
+
 Continue refining the books module:
 
 - stop rendering all existing tags as a large always-open block in the editor
