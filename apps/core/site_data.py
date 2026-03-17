@@ -9,7 +9,7 @@ SITE_MODULES = [
         "key": "books",
         "title": "收藏书籍",
         "route_name": "books:index",
-        "description": "阅读、笔记与归档放在同一处，像整理一间私人阅览室。",
+        "description": "阅读、笔记与归档放在同一处，像整理一间安静的阅览室。",
         "state": "首版开发",
         "available": True,
     },

@@ -36,8 +36,6 @@ HOME_TIMELINE = [
     {"date": "下一步", "title": "把更多真实页面和个人内容接进首页"},
 ]
 
-GITHUB_URL = "https://github.com/Albertlearnpython/RememberMyself"
-
 
 def index(request):
     modules = get_site_modules()
@@ -55,7 +53,7 @@ def index(request):
             "这里不是展示型官网，而是一份仍在生长的个人档案册入口。"
             " 书、声音、食物和风景不急着解释自己，只先在首页安静出现。"
         ),
-        "primary_action": {"label": "进入私人藏书室", "path": reverse("books:index")},
+        "primary_action": {"label": "进入藏书室", "path": reverse("books:index")},
         "secondary_action": {"label": "看记忆溪流", "path": "/#memory-streams"},
     }
     home_stats = [
@@ -123,7 +121,6 @@ def index(request):
         "profile": HOME_PROFILE,
         "profile_timeline": HOME_TIMELINE,
         "home_stats": home_stats,
-        "github_url": GITHUB_URL,
         "memory_streams": memory_streams,
         "modules": modules,
         "recent_updates": recent_updates,
@@ -144,7 +141,7 @@ def _build_memory_streams(books, tracks):
             "key": "books",
             "tone": "books",
             "title": "书影流",
-            "subtitle": "私人藏书",
+            "subtitle": "藏书归档",
             "description": "读过的、在读的、准备靠近的，都先以封面留下。",
             "count_label": f"{len(book_items)} 本" if book_items else "尚未入册",
             "enter_label": "进入藏书室",
