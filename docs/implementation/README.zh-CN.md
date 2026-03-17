@@ -27,6 +27,10 @@ docs/implementation/
 - [接口草案总规范（中文）](./system/api-draft.zh-CN.md)
 - [状态机总规范（中文）](./system/state-machine-conventions.zh-CN.md)
 
+实现前还需要配合阅读的系统级设计：
+
+- [全站色彩系统方案（中文）](../design/system/color-system.zh-CN.md)
+
 ## 页面模块实现说明
 
 - [首页模块实现说明（中文）](./modules/home-module-spec.zh-CN.md)

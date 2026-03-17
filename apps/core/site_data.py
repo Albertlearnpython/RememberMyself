@@ -24,10 +24,10 @@ SITE_MODULES = [
     {
         "key": "music",
         "title": "喜欢的音乐",
-        "route_name": "core:music",
-        "description": "以后会放下音乐、专辑与情绪记录，支持播放和下载。",
-        "state": "设计中",
-        "available": False,
+        "route_name": "music:index",
+        "description": "收藏喜欢的音乐、封面与文件，把听过的东西安静归档下来。",
+        "state": "首版开发",
+        "available": True,
     },
     {
         "key": "scenery",

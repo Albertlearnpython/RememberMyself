@@ -1,9 +1,27 @@
 # 喜欢的音乐模块实现说明
 
+## 当前实现目标
+
+音乐模块第一版不做在线播放。
+
+实现范围收敛为：
+
+- 音乐列表
+- 音乐详情
+- 上传音乐文件
+- 下载音乐文件
+- 标签与权限
+- 首页声纹流接入
+
 ## 路由
 
 - `/music`
 - `/music/:id`
+- `/music/create`
+- `/music/:id/edit`
+- `/music/:id/delete`
+- `/music/asset/:id/download`
+- `/music/asset/:id/delete`
 
 ## 组件树
 
@@ -14,8 +32,7 @@ MusicPage
 ├─ MusicListSection
 │  └─ MusicListItem
 ├─ MusicDetailPanel
-├─ MusicPlayerPanel
-├─ ProtectedAssetPanel
+├─ ProtectedMusicAssetPanel
 └─ MusicEditorDrawer
 ```
 
@@ -23,135 +40,76 @@ MusicPage
 
 | 组件 | 责任 | 关键输入 |
 | --- | --- | --- |
-| `MusicPage` | 页面编排与主请求 | `session`, `route` |
+| `MusicPage` | 编排页面与筛选状态 | `session`, `query` |
 | `MusicHeader` | 搜索与新增入口 | `query`, `canEdit` |
-| `MusicFilterRail` | 风格、情绪、可播放筛选 | `filters` |
-| `MusicListSection` | 曲目列表和空态 | `items`, `selectedId` |
-| `MusicListItem` | 单曲条目 | `track` |
-| `MusicDetailPanel` | 曲目信息和喜欢原因 | `track` |
-| `MusicPlayerPanel` | 播放器控制 | `src`, `status` |
-| `ProtectedAssetPanel` | 资源权限区 | `asset`, `session` |
-| `MusicEditorDrawer` | 新增/编辑曲目 | `mode`, `track` |
+| `MusicFilterRail` | 标签、可见性筛选 | `filters`, `tags` |
+| `MusicListSection` | 音乐列表与空态 | `tracks`, `selectedId` |
+| `MusicListItem` | 单个音乐条目 | `track` |
+| `MusicDetailPanel` | 音乐详情展示 | `track`, `assets` |
+| `ProtectedMusicAssetPanel` | 下载区和权限提示 | `assetRows`, `session` |
+| `MusicEditorDrawer` | 新增与编辑抽屉 | `mode`, `form` |
 
-## 接口草案
+## 数据模型建议
 
-| 方法 | 路径 | 用途 |
-| --- | --- | --- |
-| `GET` | `/api/music` | 获取曲库列表 |
-| `GET` | `/api/music/:id` | 获取曲目详情 |
-| `POST` | `/api/music` | 新增曲目 |
-| `PATCH` | `/api/music/:id` | 更新曲目 |
-| `DELETE` | `/api/music/:id` | 删除曲目 |
-| `POST` | `/api/music/:id/assets` | 上传音频资源 |
-| `POST` | `/api/music/:id/play-session` | 获取播放 URL |
+### `MusicTrack`
 
-## 状态机
+- `title`
+- `artist`
+- `album`
+- `cover_image_url`
+- `short_review`
+- `why_it_matters`
+- `long_note`
+- `visibility`
+- `created_at`
+- `updated_at`
 
-```mermaid
-stateDiagram-v2
-    [*] --> loading
-    loading --> ready
-    ready --> selecting
-    selecting --> detailReady
-    detailReady --> playerReady
-    playerReady --> playing
-    playing --> paused
-    paused --> playing
-    ready --> drawerCreate
-```
+### `MusicTag`
 
-## 实现注意点
+- `name`
+- `created_at`
 
-- 播放器状态不要散落多个布尔值
-- 游客态能看到资源存在，但不能直接播放
-- 手机端播放器操作必须单手可完成
+### `MusicAsset`
 
-## 接口字段级示例
+- `music`
+- `file`
+- `file_name`
+- `file_size`
+- `download_enabled`
+- `visibility`
+- `created_at`
+- `updated_at`
 
-### `GET /api/music`
+## 服务端渲染上下文
 
-```json
-{
-  "success": true,
-  "data": [
-    {
-      "id": 41,
-      "title": "夜航星",
-      "artist": "不才",
-      "album": "夜航星",
-      "genres": ["国风", "叙事"],
-      "moodTags": ["安静", "夜晚"],
-      "durationMs": 263000,
-      "playable": true,
-      "coverImageUrl": "https://example.com/music-cover.jpg",
-      "detailPath": "/music/41"
-    }
-  ]
-}
-```
+音乐模块第一版可以直接沿用书籍模块的服务端渲染方式，不需要先拆 API。
 
-| 字段 | 类型 | 示例 | 说明 |
-| --- | --- | --- | --- |
-| `artist` | `string` | `不才` | 演唱者或创作者 |
-| `genres` | `string[]` | `["国风","叙事"]` | 风格标签 |
-| `moodTags` | `string[]` | `["安静","夜晚"]` | 使用场景或情绪标签 |
-| `durationMs` | `number` | `263000` | 时长，前端格式化为 `04:23` |
-| `playable` | `boolean` | `true` | 当前账号是否具备播放条件 |
-
-### `GET /api/music/:id`
+页面上下文建议：
 
 ```json
 {
-  "success": true,
-  "data": {
-    "id": 41,
-    "title": "夜航星",
-    "artist": "不才",
-    "album": "夜航星",
-    "releaseDate": "2021-06-01",
-    "genres": ["国风", "叙事"],
-    "moodTags": ["安静", "夜晚"],
-    "whyILikeIt": "适合深夜清理情绪时单曲循环。",
-    "lyricExcerpt": "不需要整段歌词，只保留自己标记的片段。",
-    "assets": [
-      {
-        "id": 17,
-        "assetType": "audio",
-        "fileName": "night-flight-star.flac",
-        "visibility": "login_required",
-        "streamEnabled": true,
-        "downloadEnabled": false
-      }
-    ]
-  }
+  "tracks": [],
+  "selected_track": null,
+  "asset_rows": [],
+  "available_tags": [],
+  "active_filters": {
+    "q": "",
+    "tag": "",
+    "visibility": ""
+  },
+  "editor_mode": null,
+  "form": null,
+  "can_edit": false
 }
 ```
 
-| 字段 | 类型 | 示例 | 说明 |
-| --- | --- | --- | --- |
-| `releaseDate` | `string` | `2021-06-01` | 发行时间 |
-| `whyILikeIt` | `string` | `适合深夜清理情绪时单曲循环。` | 喜欢原因，是详情主文案 |
-| `lyricExcerpt` | `string` | `不需要整段歌词...` | 只保存被标记的短句 |
-| `assets[].streamEnabled` | `boolean` | `true` | 是否允许在线播放 |
-| `assets[].downloadEnabled` | `boolean` | `false` | 是否允许下载原文件 |
+## 交互规则
 
-### `POST /api/music/:id/player-session`
-
-```json
-{
-  "success": true,
-  "data": {
-    "sessionId": "ps_7Xa2",
-    "streamUrl": "https://media.example.com/stream/ps_7Xa2.m3u8",
-    "expiresAt": "2026-03-16T11:00:00+08:00"
-  }
-}
-```
-
-说明：
-
-- 播放器不要直接暴露原始文件路径，统一走播放会话接口。
-- 游客态可以先返回 `403 / ASSET_LOCKED`，前端保持可见但不可播放。
+- 游客只看公开音乐
+- 登录用户可看 `login_required`
+- 编辑者可新增、编辑、上传、删除
+- 文件下载必须检查：音乐可见性、文件可见性、下载开关
+- 首页声纹流只取当前账号可见的音乐
 
 ## 页面状态细图
 
@@ -162,33 +120,64 @@ stateDiagram-v2
     listLoading --> empty
     listLoading --> pageError
 
-    listReady --> selecting
-    selecting --> detailReady
-    selecting --> detailError
-
-    detailReady --> assetLocked
-    detailReady --> playerReady
-    playerReady --> buffering: 点击播放
-    buffering --> playing
-    playing --> paused
-    paused --> playing
-    playing --> ended
-    ended --> playerReady
-
-    detailReady --> drawerEdit
+    listReady --> selected
+    selected --> drawerEdit
     listReady --> drawerCreate
+
     drawerCreate --> submitting
     drawerEdit --> submitting
-    submitting --> detailReady
+    submitting --> selected
     submitting --> submitError
 
-    assetLocked --> detailReady: 登录后重取资源
-    pageError --> listLoading: 重试
+    selected --> assetDownloadable
+    selected --> assetLocked
 ```
 
-状态说明：
+## 接口草案
 
-- `assetLocked`：资源存在，但权限不足。
-- `playerReady`：播放器已经拿到播放会话，可立即播放。
-- `buffering / playing / paused / ended`：统一归播放器状态机管理，不要散落到多个局部布尔值。
-- `submitError`：曲目信息和资源上传任一失败，都应把抽屉保留在当前状态。
+虽然第一版可先服务端渲染，但后续接口建议如下：
+
+| 方法 | 路径 | 用途 |
+| --- | --- | --- |
+| `GET` | `/api/music` | 获取音乐列表 |
+| `GET` | `/api/music/:id` | 获取音乐详情 |
+| `POST` | `/api/music` | 新增音乐 |
+| `PATCH` | `/api/music/:id` | 更新音乐 |
+| `DELETE` | `/api/music/:id` | 删除音乐 |
+| `POST` | `/api/music/:id/assets` | 上传文件 |
+| `GET` | `/api/music/assets/:id/download` | 下载文件 |
+
+## 与首页的关系
+
+首页中的 `声纹流` 应直接消费音乐模块真实数据。
+
+字段需求：
+
+- `id`
+- `title`
+- `artist`
+- `cover_image_url`
+- `detail path`
+
+生成后映射为首页流带卡片：
+
+```json
+{
+  "id": "music-12",
+  "kind": "music",
+  "title": "夜航星",
+  "meta": "不才",
+  "path": "/music/12/",
+  "image_url": "https://...",
+  "fallback": "夜"
+}
+```
+
+## 第一版测试要求
+
+- 游客只能看到公开音乐
+- 登录用户可以看到登录可见音乐
+- 编辑者能创建音乐并上传文件
+- 音乐文件下载路由返回附件
+- 首页出现真实 `声纹流`
+- 首页声纹流能展示音乐标题或封面兜底

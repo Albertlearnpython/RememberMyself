@@ -1,0 +1,276 @@
+{% extends "base.html" %}
+{% load books_tags %}
+
+{% block body_class %}page page--music{% endblock %}
+
+{% block content %}
+<section class="music-page">
+    <div class="music-page__header">
+        <div>
+            <p class="section-label">喜欢的音乐</p>
+            <h1>私人听音档案柜</h1>
+        </div>
+        <div class="music-page__actions">
+            <form method="get" class="music-search">
+                <input
+                    type="search"
+                    name="q"
+                    value="{{ active_filters.q }}"
+                    placeholder="搜索曲名、歌手、专辑、标签或说明"
+                >
+                {% if active_filters.tag %}
+                    <input type="hidden" name="tag" value="{{ active_filters.tag }}">
+                {% endif %}
+                {% if active_filters.visibility %}
+                    <input type="hidden" name="visibility" value="{{ active_filters.visibility }}">
+                {% endif %}
+                <button class="button button--secondary" type="submit">搜索</button>
+            </form>
+            {% if can_edit %}
+                <a class="button button--primary" href="{% url 'music:index' %}?editor=create">新增音乐</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="music-layout">
+        <aside class="music-filters">
+            {% if can_edit %}
+                <div class="filter-group">
+                    <p class="filter-group__title">可见性</p>
+                    <a class="filter-chip {% if not active_filters.visibility %}is-active{% endif %}" href="{% url 'music:index' %}">
+                        全部
+                    </a>
+                    {% for value, label in visibility_filters %}
+                        <a
+                            class="filter-chip {% if active_filters.visibility == value %}is-active{% endif %}"
+                            href="{% url 'music:index' %}?visibility={{ value }}"
+                        >
+                            {{ label }}
+                        </a>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <div class="filter-group">
+                <p class="filter-group__title">标签</p>
+                <a class="filter-chip {% if not active_filters.tag %}is-active{% endif %}" href="{% url 'music:index' %}">
+                    全部标签
+                </a>
+                {% for tag in available_tags %}
+                    <a
+                        class="filter-chip filter-chip--tone-{{ tag.name|tag_tone }} {% if active_filters.tag == tag.name %}is-active{% endif %}"
+                        href="{% url 'music:index' %}?tag={{ tag.name|urlencode }}"
+                    >
+                        {{ tag.name }}
+                    </a>
+                {% empty %}
+                    <p class="muted-copy">等第一批音乐加入后，这里会自动长出标签。</p>
+                {% endfor %}
+            </div>
+        </aside>
+
+        <section class="music-list">
+            {% if tracks %}
+                {% for track in tracks %}
+                    <a
+                        class="music-card {% if selected_track and selected_track.pk == track.pk %}is-selected{% endif %}"
+                        href="{% url 'music:detail' track.pk %}{{ filter_query }}"
+                    >
+                        <div class="music-card__cover">
+                            {% if track.cover_image_url %}
+                                <img src="{{ track.cover_image_url }}" alt="{{ track.title }} 封面">
+                            {% else %}
+                                <span>{{ track.title|slice:":1" }}</span>
+                            {% endif %}
+                        </div>
+                        <div class="music-card__body is-copyable">
+                            <div class="music-card__meta is-copyable">
+                                <strong>{{ track.title }}</strong>
+                                {% if track.artist or track.album %}
+                                    <small>
+                                        {% if track.artist %}{{ track.artist }}{% else %}歌手待补充{% endif %}
+                                        {% if track.album %} · {{ track.album }}{% endif %}
+                                    </small>
+                                {% endif %}
+                            </div>
+                            <div class="music-card__chips">
+                                {% for tag in track.tag_links.all|slice:":4" %}
+                                    <span class="meta-pill meta-pill--tone-{{ tag.name|tag_tone }}">{{ tag.name }}</span>
+                                {% endfor %}
+                                <span class="meta-pill meta-pill--neutral">{{ track.get_visibility_display }}</span>
+                            </div>
+                            <p class="music-card__summary is-copyable">
+                                {% if track.short_review %}
+                                    {{ track.short_review }}
+                                {% else %}
+                                    这首歌已经进入档案柜，短评还没有写下。
+                                {% endif %}
+                            </p>
+                        </div>
+                        <div class="music-card__aside">
+                            <small>{{ track.updated_at|date:"Y-m-d" }}</small>
+                            <span>查看</span>
+                        </div>
+                    </a>
+                {% endfor %}
+            {% else %}
+                <div class="empty-panel">
+                    <h2>音乐柜还没有内容</h2>
+                    <p>第一版已经接好了封面展示、详情区、文件下载和首页声纹流，现在只差第一首歌被放进来。</p>
+                    {% if can_edit %}
+                        <a class="button button--primary" href="{% url 'music:index' %}?editor=create">加入第一首音乐</a>
+                    {% endif %}
+                </div>
+            {% endif %}
+        </section>
+
+        <aside class="music-detail">
+            {% if selected_track %}
+                <div class="music-detail__cover">
+                    {% if selected_track.cover_image_url %}
+                        <img src="{{ selected_track.cover_image_url }}" alt="{{ selected_track.title }} 封面">
+                    {% else %}
+                        <span>{{ selected_track.title|slice:":1" }}</span>
+                    {% endif %}
+                </div>
+
+                <div class="music-detail__header">
+                    <div class="is-copyable">
+                        <h2>{{ selected_track.title }}</h2>
+                        <p>
+                            {% if selected_track.artist %}{{ selected_track.artist }}{% else %}歌手待补充{% endif %}
+                            {% if selected_track.album %} · {{ selected_track.album }}{% endif %}
+                        </p>
+                    </div>
+                    {% if can_edit %}
+                        <a class="button button--secondary" href="{% url 'music:detail' selected_track.pk %}?editor=edit">编辑</a>
+                    {% endif %}
+                </div>
+
+                <dl class="detail-meta">
+                    <div><dt>曲名</dt><dd class="is-copyable">{{ selected_track.title }}</dd></div>
+                    <div><dt>歌手</dt><dd class="is-copyable">{{ selected_track.artist|default:"待补充" }}</dd></div>
+                    <div><dt>专辑</dt><dd class="is-copyable">{{ selected_track.album|default:"-" }}</dd></div>
+                    <div><dt>可见性</dt><dd class="is-copyable">{{ selected_track.get_visibility_display }}</dd></div>
+                    <div>
+                        <dt>标签</dt>
+                        <dd class="detail-tags">
+                            {% for tag in selected_track.tag_links.all %}
+                                <span class="meta-pill meta-pill--tone-{{ tag.name|tag_tone }}">{{ tag.name }}</span>
+                            {% empty %}
+                                -
+                            {% endfor %}
+                        </dd>
+                    </div>
+                </dl>
+
+                <section class="note-panel note-panel--accent music-detail__note-accent">
+                    <span class="section-label">为什么喜欢</span>
+                    <p class="is-copyable">{{ selected_track.why_it_matters|default:"这部分还没写下。等你补上这首歌为什么值得被记住。" }}</p>
+                </section>
+
+                <section class="note-panel">
+                    <span class="section-label">长说明</span>
+                    <div class="rich-copy is-copyable">
+                        {{ selected_track.long_note|default:"这里以后会放下更完整的感受、场景和回想。"|linebreaks }}
+                    </div>
+                </section>
+
+                <section class="asset-panel">
+                    <div class="asset-panel__header">
+                        <div>
+                            <span class="section-label">受保护文件</span>
+                            <h3>音乐文件</h3>
+                        </div>
+                        {% if not request.user.is_authenticated %}
+                            <a class="button button--secondary" href="{% url 'login' %}?next={{ request.get_full_path|urlencode }}">登录后访问</a>
+                        {% endif %}
+                    </div>
+                    {% if asset_rows %}
+                        <div class="asset-list">
+                            {% for row in asset_rows %}
+                                <article class="asset-card">
+                                    <div class="is-copyable">
+                                        <strong>{{ row.asset.file_name }}</strong>
+                                        <p>{{ row.asset.file_extension|default:"音频文件" }} · {{ row.asset.formatted_file_size }}</p>
+                                    </div>
+                                    <div class="asset-card__actions">
+                                        {% if request.user.is_authenticated and row.can_download %}
+                                            <a class="button button--secondary" href="{% url 'music:download_asset' row.asset.pk %}">
+                                                下载文件
+                                            </a>
+                                        {% elif not request.user.is_authenticated %}
+                                            <span class="meta-pill meta-pill--neutral">登录后下载</span>
+                                        {% else %}
+                                            <span class="meta-pill meta-pill--neutral">当前权限不可下载</span>
+                                        {% endif %}
+                                        {% if can_edit %}
+                                            <form method="post" action="{% url 'music:delete_asset' row.asset.pk %}">
+                                                {% csrf_token %}
+                                                <button class="button button--danger" type="submit">删除文件</button>
+                                            </form>
+                                        {% endif %}
+                                    </div>
+                                </article>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="muted-copy">这首音乐还没有挂载文件。以后可以上传音频源文件或补充资料。</p>
+                    {% endif %}
+                </section>
+
+                {% if can_edit %}
+                    <form class="danger-form" method="post" action="{% url 'music:delete' selected_track.pk %}">
+                        {% csrf_token %}
+                        <button class="button button--danger" type="submit">删除这首音乐</button>
+                    </form>
+                {% endif %}
+            {% else %}
+                <div class="empty-panel">
+                    <h2>详情区会停在这里</h2>
+                    <p>选中左侧音乐卡片后，右边会显示封面、喜欢原因、长说明和音乐文件下载区。</p>
+                </div>
+            {% endif %}
+        </aside>
+    </div>
+</section>
+
+{% if editor_mode and form %}
+    <div class="drawer-backdrop">
+        <aside class="editor-drawer">
+            <div class="editor-drawer__header">
+                <div>
+                    <p class="section-label">编辑抽屉</p>
+                    <h2>{% if editor_mode == "edit" %}编辑音乐{% else %}新增音乐{% endif %}</h2>
+                </div>
+                <a class="button button--secondary" href="{% if selected_track %}{% url 'music:detail' selected_track.pk %}{% else %}{% url 'music:index' %}{% endif %}">关闭</a>
+            </div>
+
+            <form
+                method="post"
+                enctype="multipart/form-data"
+                class="editor-drawer__form"
+                action="{% if editor_mode == 'edit' and selected_track %}{% url 'music:edit' selected_track.pk %}{% else %}{% url 'music:create' %}{% endif %}"
+            >
+                {% csrf_token %}
+                <div class="editor-drawer__body">
+                    {% if form.non_field_errors %}
+                        <div class="form-errors">
+                            {% for error in form.non_field_errors %}
+                                <p>{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                    {% include "music/partials/music_form_fields.html" %}
+                </div>
+                <div class="editor-drawer__footer">
+                    <a class="button button--secondary" href="{% if selected_track %}{% url 'music:detail' selected_track.pk %}{% else %}{% url 'music:index' %}{% endif %}">
+                        取消
+                    </a>
+                    <button class="button button--primary" type="submit">保存</button>
+                </div>
+            </form>
+        </aside>
+    </div>
+{% endif %}
+{% endblock %}

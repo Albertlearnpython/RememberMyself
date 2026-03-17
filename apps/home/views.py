@@ -4,12 +4,15 @@ from django.utils import timezone
 
 from apps.books.models import Book
 from apps.core.site_data import SITE_TAGLINE, get_site_modules
+from apps.music.models import MusicTrack
 
 
 def index(request):
     modules = get_site_modules()
     visible_books = list(Book.objects.visible_to_user(request.user))
+    visible_tracks = list(MusicTrack.objects.visible_to_user(request.user))
     latest_book = visible_books[0] if visible_books else None
+    latest_track = visible_tracks[0] if visible_tracks else None
     implemented_modules = sum(1 for module in modules if module["available"])
     today = timezone.localdate()
 
@@ -24,7 +27,7 @@ def index(request):
         "secondary_action": {"label": "看记忆溪流", "path": "/#memory-streams"},
     }
 
-    memory_streams = _build_memory_streams(visible_books)
+    memory_streams = _build_memory_streams(visible_books, visible_tracks)
 
     recent_updates = [
         {
@@ -53,9 +56,15 @@ def index(request):
         },
         {
             "module": "喜欢的音乐",
-            "summary": "声纹流结构已就位，后续会改为真实专辑封面与播放相关信息。",
-            "time": "待录入",
-            "path": reverse("core:music"),
+            "summary": f"最近加入《{latest_track.title}》。"
+            if latest_track
+            else "声纹流结构已就位，等第一批真实音乐入库后会直接接入首页。",
+            "time": latest_track.updated_at.strftime("%Y-%m-%d")
+            if latest_track
+            else "第一版",
+            "path": reverse("music:detail", args=[latest_track.pk])
+            if latest_track
+            else reverse("music:index"),
         },
     ]
 
@@ -74,8 +83,9 @@ def index(request):
     return render(request, "home/index.html", context)
 
 
-def _build_memory_streams(books):
+def _build_memory_streams(books, tracks):
     book_items = [_build_book_stream_item(book) for book in books]
+    music_items = [_build_music_stream_item(track) for track in tracks]
     return [
         {
             "key": "books",
@@ -100,17 +110,24 @@ def _build_memory_streams(books):
             "title": "声纹流",
             "subtitle": "喜欢的音乐",
             "description": "一首歌有时比一句话更像记忆本身。",
-            "count_label": "待录入",
+            "count_label": f"{len(music_items)} 首" if music_items else "尚未入库",
             "enter_label": "进入音乐页",
-            "path": reverse("core:music"),
-            "rows": _build_placeholder_rows(
+            "path": reverse("music:index"),
+            "rows": _build_stream_rows(
+                music_items,
+                lane_count=1,
+                direction="right",
+                durations=(52,),
+            )
+            if music_items
+            else _build_placeholder_rows(
                 kind="music",
                 lane_count=1,
                 direction="right",
                 durations=(52,),
                 item_count=12,
             ),
-            "empty_note": "真实音乐内容录入后，会在这里以专辑封面的方式持续流过。",
+            "empty_note": None if music_items else "第一首音乐录入后，声纹流会开始带着真实封面缓慢流过。",
         },
         {
             "key": "food",
@@ -160,6 +177,18 @@ def _build_book_stream_item(book):
         "path": reverse("books:detail", args=[book.pk]),
         "image_url": book.cover_image_url,
         "fallback": (book.title or "?")[:1],
+    }
+
+
+def _build_music_stream_item(track):
+    return {
+        "id": f"music-{track.pk}",
+        "kind": "music",
+        "title": track.title,
+        "meta": track.artist or track.album or "已归档",
+        "path": reverse("music:detail", args=[track.pk]),
+        "image_url": track.cover_image_url,
+        "fallback": (track.title or "?")[:1],
     }
 
 
