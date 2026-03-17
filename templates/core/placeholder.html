@@ -3,18 +3,44 @@
 {% block body_class %}page page--placeholder{% endblock %}
 
 {% block content %}
-<section class="placeholder-page">
-    <p class="section-label">{{ module.state }}</p>
-    <h1>{{ module.title }}</h1>
-    <p class="placeholder-page__lead">{{ module.description }}</p>
+<section class="placeholder-page placeholder-page--{{ module.key }}">
+    <div class="placeholder-page__hero">
+        <div class="placeholder-page__copy">
+            <p class="section-label">{{ module.state }}</p>
+            <h1>{{ module.title }}</h1>
+            <p class="placeholder-page__lead">{{ module.description }}</p>
+            <p class="placeholder-page__body">
+                这个板块已经保留好了独立入口、独立路由和独立扩展空间。
+                后续正式施工时，不需要推翻首页或其他模块，只需要把新的内容流接进来。
+            </p>
+            <div class="placeholder-page__actions">
+                <a class="button button--primary" href="{% url 'home:index' %}">回到首页</a>
+                <a class="button button--secondary" href="{% url 'books:index' %}">查看收藏书籍页</a>
+            </div>
+        </div>
+        <aside class="placeholder-page__aside">
+            <span class="eyebrow-pill">{{ module.key|upper }}</span>
+            <strong>正在搭建</strong>
+            <p>现在先保留入口、气质和文案。等真实数据接入后，这里会直接长成独立页面。</p>
+        </aside>
+    </div>
+
     <div class="placeholder-page__panel">
-        <p>
-            这个板块已经保留好独立入口，后续可以直接扩展成正式页面，
-            不需要推翻首页与其他模块的结构。
-        </p>
-        <div class="placeholder-page__actions">
-            <a class="button button--primary" href="{% url 'home:index' %}">回到首页</a>
-            <a class="button button--secondary" href="{% url 'books:index' %}">查看收藏书籍页</a>
+        <div class="section-heading section-heading--wide">
+            <p class="section-label">Other Rooms</p>
+            <h2>先从已经成形或已预留好的房间继续逛，不用停在空白里。</h2>
+        </div>
+        <div class="module-grid module-grid--compact">
+            {% for item in site_modules %}
+                {% if item.key != module.key %}
+                    <a class="module-card module-card--{{ item.key }}" href="{{ item.path }}">
+                        <span class="module-card__status">{{ item.state }}</span>
+                        <strong>{{ item.title }}</strong>
+                        <p>{{ item.description }}</p>
+                        <span class="module-card__enter">进入</span>
+                    </a>
+                {% endif %}
+            {% endfor %}
         </div>
     </div>
 </section>

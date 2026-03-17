@@ -1,15 +1,102 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block body_class %}page page--home{% endblock %}
 
 {% block content %}
-<section class="home-hero home-hero--streams">
-    <p class="section-label">{{ hero.eyebrow }}</p>
-    <h1>{{ hero.title }}</h1>
-    <p class="home-hero__body">{{ hero.body }}</p>
-    <div class="home-hero__actions">
-        <a class="button button--primary" href="{{ hero.primary_action.path }}">{{ hero.primary_action.label }}</a>
-        <a class="button button--secondary" href="{{ hero.secondary_action.path }}">{{ hero.secondary_action.label }}</a>
+<section class="home-stage">
+    <aside class="home-profile">
+        <div class="home-profile__identity">
+            <div class="home-profile__avatar">
+                <img src="{% static profile.avatar_asset %}" alt="{{ profile.name }} 的头像">
+            </div>
+            <div class="home-profile__copy">
+                <p class="section-label">Profile</p>
+                <strong>{{ profile.name }}</strong>
+                <p>{{ profile.handle }} · {{ profile.role }}</p>
+                <p class="home-profile__summary">{{ profile.summary }}</p>
+            </div>
+        </div>
+
+        <div class="home-profile__meta">
+            <span class="meta-pill meta-pill--neutral">{{ profile.location }}</span>
+            <span class="meta-pill meta-pill--neutral">{{ profile.organization }}</span>
+        </div>
+
+        <div class="home-profile__tags">
+            {% for tag in profile.tags %}
+                <span class="profile-chip">{{ tag }}</span>
+            {% endfor %}
+        </div>
+
+        <section class="home-profile__panel">
+            <p class="section-label">Timeline</p>
+            <ul class="home-profile__timeline">
+                {% for item in profile_timeline %}
+                    <li>
+                        <span>{{ item.date }}</span>
+                        <strong>{{ item.title }}</strong>
+                    </li>
+                {% endfor %}
+            </ul>
+        </section>
+
+        <section class="home-profile__panel">
+            <p class="section-label">Contact</p>
+            <div class="home-profile__contact">
+                <span>{{ profile.contact_label }}</span>
+                <strong class="is-copyable">{{ profile.contact_value }}</strong>
+            </div>
+        </section>
+    </aside>
+
+    <section class="home-intro home-intro--aurora">
+        <div class="home-intro__topline">
+            <span class="eyebrow-pill">{{ hero.eyebrow }}</span>
+            <div class="home-intro__orbs" aria-hidden="true">
+                <span class="home-intro__orb home-intro__orb--blue"></span>
+                <span class="home-intro__orb home-intro__orb--green"></span>
+                <span class="home-intro__orb home-intro__orb--orange"></span>
+            </div>
+        </div>
+        <p class="section-label">Personal Homepage</p>
+        <h1 class="home-intro__title">{{ profile.hero_title }}</h1>
+        <p class="home-intro__subtitle">{{ profile.hero_subtitle }}</p>
+        <p class="home-intro__motto">{{ profile.motto }}</p>
+        <p class="home-intro__body">{{ hero.title }} {{ hero.body }}</p>
+        <div class="home-intro__actions">
+            <a class="button button--primary" href="{{ hero.primary_action.path }}">{{ hero.primary_action.label }}</a>
+            <a class="button button--secondary" href="{{ hero.secondary_action.path }}">{{ hero.secondary_action.label }}</a>
+            <a class="button button--secondary" href="{{ github_url }}" target="_blank" rel="noreferrer">查看源码</a>
+        </div>
+
+        <div class="home-stat-grid">
+            {% for stat in home_stats %}
+                <article class="home-stat-card">
+                    <span>{{ stat.label }}</span>
+                    <strong>{{ stat.value }}</strong>
+                    <small>{{ stat.note }}</small>
+                </article>
+            {% endfor %}
+        </div>
+    </section>
+</section>
+
+<section class="module-index module-index--home" id="module-index">
+    <div class="section-heading section-heading--wide">
+        <p class="section-label">Projects</p>
+        <h2>首页是个人介绍入口，模块页才是每一条记录真正停留的地方。</h2>
+        <p class="memory-streams__lead">{{ module_index_summary }}</p>
+    </div>
+    <div class="module-grid module-grid--home">
+        {% for module in modules %}
+            <a class="module-card module-card--{{ module.key }}" href="{{ module.path }}">
+                <span class="module-card__status">{{ module.state }}</span>
+                <strong>{{ module.title }}</strong>
+                <p>{{ module.description }}</p>
+                <span class="module-card__enter">进入</span>
+            </a>
+        {% endfor %}
     </div>
 </section>
 
@@ -77,24 +164,6 @@
                     {% endif %}
                 </div>
             </section>
-        {% endfor %}
-    </div>
-</section>
-
-<section class="module-index" id="module-index">
-    <div class="section-heading section-heading--wide">
-        <p class="section-label">模块索引</p>
-        <h2>流带负责把内容带到眼前，索引负责把整个结构放回秩序里。</h2>
-        <p class="memory-streams__lead">{{ module_index_summary }}</p>
-    </div>
-    <div class="module-grid">
-        {% for module in modules %}
-            <a class="module-card" href="{{ module.path }}">
-                <span class="module-card__status">{{ module.state }}</span>
-                <strong>{{ module.title }}</strong>
-                <p>{{ module.description }}</p>
-                <span class="module-card__enter">进入</span>
-            </a>
         {% endfor %}
     </div>
 </section>

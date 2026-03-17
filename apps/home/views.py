@@ -7,6 +7,38 @@ from apps.core.site_data import SITE_TAGLINE, get_site_modules
 from apps.music.models import MusicTrack
 
 
+HOME_PROFILE = {
+    "name": "孙伯符",
+    "handle": "Noah Brooks",
+    "role": "Python / AI / 阅读",
+    "location": "深圳",
+    "organization": "华南农业大学 · 本科",
+    "summary": "一个喜欢读书的人。",
+    "hero_title": "孙伯符 / Noah Brooks",
+    "hero_subtitle": "在深圳记录 Python、AI、阅读与持续搭建，把零散的学习过程整理成长期作品。",
+    "motto": "静水流深，金石为开；守拙见慧，癸水逢源。",
+    "avatar_asset": "site/avatar-wechat.jpg",
+    "avatar_label": "孙",
+    "contact_label": "微信",
+    "contact_value": "djm13126042156",
+    "tags": [
+        "Python",
+        "AI",
+        "阅读",
+        "深圳",
+        "华南农业大学",
+    ],
+}
+
+HOME_TIMELINE = [
+    {"date": "2026-03-14", "title": "RememberMyself 项目启动"},
+    {"date": "进行中", "title": "持续整理书籍、音乐与长期记录"},
+    {"date": "下一步", "title": "把更多真实页面和个人内容接进首页"},
+]
+
+GITHUB_URL = "https://github.com/Albertlearnpython/RememberMyself"
+
+
 def index(request):
     modules = get_site_modules()
     visible_books = list(Book.objects.visible_to_user(request.user))
@@ -26,6 +58,23 @@ def index(request):
         "primary_action": {"label": "进入私人藏书室", "path": reverse("books:index")},
         "secondary_action": {"label": "看记忆溪流", "path": "/#memory-streams"},
     }
+    home_stats = [
+        {
+            "label": "已入藏书",
+            "value": len(visible_books),
+            "note": "把读过、正在读和想读的东西慢慢归档。",
+        },
+        {
+            "label": "已归档音乐",
+            "value": len(visible_tracks),
+            "note": "封面与文件都能在这里留下来。",
+        },
+        {
+            "label": "已落地板块",
+            "value": implemented_modules,
+            "note": "以后新增页面时，不需要推翻首页结构。",
+        },
+    ]
 
     memory_streams = _build_memory_streams(visible_books, visible_tracks)
 
@@ -71,6 +120,10 @@ def index(request):
     context = {
         "page_title": "首页",
         "hero": hero,
+        "profile": HOME_PROFILE,
+        "profile_timeline": HOME_TIMELINE,
+        "home_stats": home_stats,
+        "github_url": GITHUB_URL,
         "memory_streams": memory_streams,
         "modules": modules,
         "recent_updates": recent_updates,
