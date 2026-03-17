@@ -5,6 +5,7 @@ from django.utils import timezone
 from apps.books.models import Book
 from apps.core.site_data import SITE_TAGLINE, get_site_modules
 from apps.music.models import MusicTrack
+from apps.scenery.models import SceneryEntry
 
 
 HOME_PROFILE = {
@@ -41,8 +42,10 @@ def index(request):
     modules = get_site_modules()
     visible_books = list(Book.objects.visible_to_user(request.user))
     visible_tracks = list(MusicTrack.objects.visible_to_user(request.user))
+    visible_scenery = list(SceneryEntry.objects.visible_to_user(request.user).prefetch_related("photos"))
     latest_book = visible_books[0] if visible_books else None
     latest_track = visible_tracks[0] if visible_tracks else None
+    latest_scenery = visible_scenery[0] if visible_scenery else None
     implemented_modules = sum(1 for module in modules if module["available"])
     today = timezone.localdate()
 
@@ -74,7 +77,7 @@ def index(request):
         },
     ]
 
-    memory_streams = _build_memory_streams(visible_books, visible_tracks)
+    memory_streams = _build_memory_streams(visible_books, visible_tracks, visible_scenery)
 
     recent_updates = [
         {
@@ -96,10 +99,16 @@ def index(request):
             "path": "/#memory-streams",
         },
         {
-            "module": "喜欢的美食",
-            "summary": "食味流已预留位置，等真实内容录入后会直接接入首页流带。",
-            "time": "待录入",
-            "path": reverse("core:food"),
+            "module": "喜欢的景色",
+            "summary": f"最近收进“{latest_scenery.display_title}”。"
+            if latest_scenery
+            else "风景流已经接好上传和自动识别结构，等第一批真实照片流入首页。",
+            "time": latest_scenery.updated_at.strftime("%Y-%m-%d")
+            if latest_scenery
+            else "第一版",
+            "path": reverse("scenery:detail", args=[latest_scenery.pk])
+            if latest_scenery
+            else reverse("scenery:index"),
         },
         {
             "module": "喜欢的音乐",
@@ -133,9 +142,10 @@ def index(request):
     return render(request, "home/index.html", context)
 
 
-def _build_memory_streams(books, tracks):
+def _build_memory_streams(books, tracks, scenery_entries):
     book_items = [_build_book_stream_item(book) for book in books]
     music_items = [_build_music_stream_item(track) for track in tracks]
+    scenery_items = [_build_scenery_stream_item(entry) for entry in scenery_entries]
     return [
         {
             "key": "books",
@@ -201,19 +211,26 @@ def _build_memory_streams(books, tracks):
             "key": "scenery",
             "tone": "scenery",
             "title": "风景流",
-            "subtitle": "喜欢的景色",
-            "description": "有些地方并不属于我，却长期停在我的视线里。",
-            "count_label": "待录入",
+            "subtitle": "景色归档",
+            "description": "手机拍下的那一刻，会把时间、地点和心情一起留下来。",
+            "count_label": f"{len(scenery_items)} 组" if scenery_items else "尚未入册",
             "enter_label": "进入景色页",
-            "path": reverse("core:scenery"),
-            "rows": _build_placeholder_rows(
+            "path": reverse("scenery:index"),
+            "rows": _build_stream_rows(
+                scenery_items,
+                lane_count=1,
+                direction="right",
+                durations=(74,),
+            )
+            if scenery_items
+            else _build_placeholder_rows(
                 kind="scenery",
                 lane_count=1,
                 direction="right",
                 durations=(74,),
                 item_count=7,
             ),
-            "empty_note": "景色模块有真实照片后，这里会变成横向漂流的远景带。",
+            "empty_note": None if scenery_items else "第一组景色录入后，风景流会从这里开始缓慢漂过首页。",
         },
     ]
 
@@ -239,6 +256,21 @@ def _build_music_stream_item(track):
         "path": reverse("music:detail", args=[track.pk]),
         "image_url": track.cover_image_url,
         "fallback": (track.title or "?")[:1],
+    }
+
+
+def _build_scenery_stream_item(entry):
+    meta = entry.location_summary
+    if entry.captured_at:
+        meta = f"{meta} · {timezone.localtime(entry.captured_at):%Y-%m-%d}"
+    return {
+        "id": f"scenery-{entry.pk}",
+        "kind": "scenery",
+        "title": entry.display_title,
+        "meta": meta,
+        "path": reverse("scenery:detail", args=[entry.pk]),
+        "image_url": entry.cover_image_url,
+        "fallback": (entry.display_title or "?")[:1],
     }
 
 

@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'apps.home',
     'apps.books',
     'apps.music',
+    'apps.scenery',
 ]
 
 MIDDLEWARE = [

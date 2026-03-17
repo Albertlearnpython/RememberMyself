@@ -9,6 +9,7 @@ urlpatterns = [
     path('', include('apps.home.urls')),
     path('books/', include('apps.books.urls')),
     path('music/', include('apps.music.urls')),
+    path('scenery/', include('apps.scenery.urls')),
     path('', include('apps.core.urls')),
     path(
         'login/',

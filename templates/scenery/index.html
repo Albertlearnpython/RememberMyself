@@ -1,0 +1,317 @@
+{% extends "base.html" %}
+
+{% block body_class %}page page--scenery{% endblock %}
+
+{% block content %}
+<section class="scenery-page">
+    <div class="scenery-page__header">
+        <div>
+            <p class="section-label">喜欢的景色</p>
+            <h1>风景档案</h1>
+        </div>
+        <div class="scenery-page__actions">
+            <form method="get" class="scenery-search">
+                <input
+                    type="search"
+                    name="q"
+                    value="{{ active_filters.q }}"
+                    placeholder="搜索地点、标题、说明或记忆"
+                >
+                {% if active_filters.city %}
+                    <input type="hidden" name="city" value="{{ active_filters.city }}">
+                {% endif %}
+                {% if active_filters.year %}
+                    <input type="hidden" name="year" value="{{ active_filters.year }}">
+                {% endif %}
+                <button class="button button--secondary" type="submit">搜索</button>
+            </form>
+            {% if can_edit %}
+                <a class="button button--primary" href="{% url 'scenery:index' %}?editor=create">新增景色</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="scenery-layout">
+        <aside class="scenery-filters">
+            <div class="filter-group">
+                <p class="filter-group__title">城市</p>
+                <a class="filter-chip {% if not active_filters.city %}is-active{% endif %}" href="{% url 'scenery:index' %}">
+                    全部
+                </a>
+                {% for location in location_filters %}
+                    <a
+                        class="filter-chip {% if active_filters.city == location %}is-active{% endif %}"
+                        href="{% url 'scenery:index' %}?city={{ location|urlencode }}"
+                    >
+                        {{ location }}
+                    </a>
+                {% empty %}
+                    <p class="muted-copy">等第一批带定位的照片上传后，这里会自动长出城市筛选。</p>
+                {% endfor %}
+            </div>
+
+            <div class="filter-group">
+                <p class="filter-group__title">年份</p>
+                <a class="filter-chip {% if not active_filters.year %}is-active{% endif %}" href="{% url 'scenery:index' %}">
+                    全部
+                </a>
+                {% for year in year_filters %}
+                    <a
+                        class="filter-chip {% if active_filters.year == year|stringformat:'s' %}is-active{% endif %}"
+                        href="{% url 'scenery:index' %}?year={{ year }}"
+                    >
+                        {{ year }}
+                    </a>
+                {% empty %}
+                    <p class="muted-copy">识别到拍摄时间后，这里会出现年份筛选。</p>
+                {% endfor %}
+            </div>
+        </aside>
+
+        <section class="scenery-list">
+            {% if entries %}
+                {% for entry in entries %}
+                    <a
+                        class="scenery-card {% if selected_entry and selected_entry.pk == entry.pk %}is-selected{% endif %}"
+                        href="{% url 'scenery:detail' entry.pk %}{{ filter_query }}"
+                    >
+                        <div class="scenery-card__cover">
+                            {% if entry.primary_photo %}
+                                <img src="{{ entry.primary_photo.image_url }}" alt="{{ entry.display_title }}">
+                            {% else %}
+                                <span>{{ entry.display_title|slice:":1" }}</span>
+                            {% endif %}
+                        </div>
+                        <div class="scenery-card__body is-copyable">
+                            <div class="scenery-card__meta">
+                                <strong>{{ entry.display_title }}</strong>
+                                <small>
+                                    {{ entry.location_summary }}
+                                    {% if entry.captured_at %} · {{ entry.captured_at|date:"Y-m-d H:i" }}{% endif %}
+                                </small>
+                            </div>
+                            <p class="scenery-card__summary">
+                                {% if entry.short_note %}
+                                    {{ entry.short_note }}
+                                {% else %}
+                                    这条风景已经入档，等你补上一句当时为什么停下来。
+                                {% endif %}
+                            </p>
+                        </div>
+                        <div class="scenery-card__aside">
+                            <small>{{ entry.photo_count }} 张</small>
+                            <span>查看</span>
+                        </div>
+                    </a>
+                {% endfor %}
+            {% else %}
+                <div class="empty-panel">
+                    <h2>风景档案还没有内容</h2>
+                    <p>第一版已经接好手机上传、时间地点识别和首页风景流，现在只差第一组真实照片放进来。</p>
+                    {% if can_edit %}
+                        <a class="button button--primary" href="{% url 'scenery:index' %}?editor=create">加入第一组景色</a>
+                    {% endif %}
+                </div>
+            {% endif %}
+        </section>
+
+        <aside class="scenery-detail">
+            {% if selected_entry %}
+                <div class="scenery-detail__cover">
+                    {% if selected_entry.primary_photo %}
+                        <img src="{{ selected_entry.primary_photo.image_url }}" alt="{{ selected_entry.display_title }}">
+                    {% else %}
+                        <span>{{ selected_entry.display_title|slice:":1" }}</span>
+                    {% endif %}
+                </div>
+
+                <div class="scenery-detail__header">
+                    <div class="is-copyable">
+                        <h2>{{ selected_entry.display_title }}</h2>
+                        <p>
+                            {{ selected_entry.location_summary }}
+                            {% if selected_entry.captured_at %} · {{ selected_entry.captured_at|date:"Y-m-d H:i" }}{% endif %}
+                        </p>
+                    </div>
+                    {% if can_edit %}
+                        <a class="button button--secondary" href="{% url 'scenery:detail' selected_entry.pk %}?editor=edit">编辑</a>
+                    {% endif %}
+                </div>
+
+                <dl class="detail-meta">
+                    <div><dt>地点</dt><dd class="is-copyable">{{ selected_entry.place_name|default:selected_entry.location_summary }}</dd></div>
+                    <div><dt>地址</dt><dd class="is-copyable">{{ selected_entry.location_text|default:"待补充" }}</dd></div>
+                    <div><dt>时间</dt><dd class="is-copyable">{% if selected_entry.captured_at %}{{ selected_entry.captured_at|date:"Y-m-d H:i" }}{% else %}待补充{% endif %}</dd></div>
+                    <div><dt>坐标</dt><dd class="is-copyable">{% if selected_entry.latitude is not None and selected_entry.longitude is not None %}{{ selected_entry.latitude }}, {{ selected_entry.longitude }}{% else %}未识别{% endif %}</dd></div>
+                    <div><dt>图片</dt><dd class="is-copyable">{{ selected_entry.photo_count }} 张</dd></div>
+                </dl>
+
+                <section class="scenery-gallery">
+                    <div class="scenery-gallery__header">
+                        <span class="section-label">图片组</span>
+                        <p>默认展示上传后的可浏览版本，HEIC 会自动转成网页可显示格式。</p>
+                    </div>
+                    <div class="scenery-gallery__grid">
+                        {% for photo in selected_photos %}
+                            <article class="scenery-thumb">
+                                <img src="{{ photo.image_url }}" alt="{{ selected_entry.display_title }} 图片 {{ forloop.counter }}">
+                                <div class="scenery-thumb__meta">
+                                    <small>
+                                        {{ photo.original_filename }}
+                                        {% if photo.taken_at %} · {{ photo.taken_at|date:"Y-m-d H:i" }}{% endif %}
+                                    </small>
+                                    {% if can_edit %}
+                                        <form method="post" action="{% url 'scenery:delete_photo' photo.pk %}">
+                                            {% csrf_token %}
+                                            <button class="button button--danger" type="submit">删除图片</button>
+                                        </form>
+                                    {% endif %}
+                                </div>
+                            </article>
+                        {% empty %}
+                            <p class="muted-copy">这组景色还没有图片，等你再补一张原图进来。</p>
+                        {% endfor %}
+                    </div>
+                </section>
+
+                <section class="note-panel note-panel--accent">
+                    <span class="section-label">为什么记得这里</span>
+                    <p class="is-copyable">{{ selected_entry.why_it_matters|default:"这部分还没写下。等你补上它为什么值得被留下。" }}</p>
+                </section>
+
+                <section class="note-panel">
+                    <span class="section-label">长说明</span>
+                    <div class="rich-copy is-copyable">
+                        {{ selected_entry.long_note|default:"这里以后会放下当时的天气、同行的人和那一刻的心情。"|linebreaks }}
+                    </div>
+                </section>
+
+                {% if can_edit %}
+                    <form class="danger-form" method="post" action="{% url 'scenery:delete' selected_entry.pk %}">
+                        {% csrf_token %}
+                        <button class="button button--danger" type="submit">删除这组景色</button>
+                    </form>
+                {% endif %}
+            {% else %}
+                <div class="empty-panel">
+                    <h2>详情区会停在这里</h2>
+                    <p>选中左侧景色卡片后，右边会显示大图、地点、时间、为什么记得这里，以及整组图片。</p>
+                </div>
+            {% endif %}
+        </aside>
+    </div>
+</section>
+
+{% if editor_mode and form %}
+    <div class="drawer-backdrop">
+        <aside class="editor-drawer">
+            <div class="editor-drawer__header">
+                <div>
+                    <p class="section-label">编辑抽屉</p>
+                    <h2>{% if editor_mode == "edit" %}编辑景色{% else %}新增景色{% endif %}</h2>
+                </div>
+                <a class="button button--secondary" href="{% if selected_entry %}{% url 'scenery:detail' selected_entry.pk %}{% else %}{% url 'scenery:index' %}{% endif %}">关闭</a>
+            </div>
+
+            <form
+                method="post"
+                enctype="multipart/form-data"
+                class="editor-drawer__form"
+                action="{% if editor_mode == 'edit' and selected_entry %}{% url 'scenery:edit' selected_entry.pk %}{% else %}{% url 'scenery:create' %}{% endif %}"
+            >
+                {% csrf_token %}
+                <div class="editor-drawer__body">
+                    {% if form.non_field_errors %}
+                        <div class="form-errors">
+                            {% for error in form.non_field_errors %}
+                                <p>{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+
+                    <section class="drawer-section drawer-section--form">
+                        <div class="drawer-subsection">
+                            <div class="drawer-subsection__header">
+                                <h4>图片上传</h4>
+                                <p>支持手机端直接选择相册或拍照上传。优先上传原图，系统会尝试读取拍摄时间和 GPS。</p>
+                            </div>
+                            <label class="field">
+                                <span class="field__label">{{ form.photos.label }}</span>
+                                {{ form.photos }}
+                                <span class="field__hint">支持 JPG、PNG、WEBP、HEIC。第一版一次最多 12 张。</span>
+                                {% for error in form.photos.errors %}
+                                    <span class="field__error">{{ error }}</span>
+                                {% endfor %}
+                            </label>
+                        </div>
+
+                        <div class="drawer-subsection">
+                            <div class="drawer-subsection__header">
+                                <h4>基础信息</h4>
+                                <p>标题可以先留空，系统会按识别到的地点和时间生成一个默认标题。</p>
+                            </div>
+                            <div class="drawer-grid drawer-grid--two">
+                                {% for field in form %}
+                                    {% if field.name == "title" or field.name == "short_note" or field.name == "visibility" %}
+                                        <label class="field">
+                                            <span class="field__label">{{ field.label }}</span>
+                                            {{ field }}
+                                            {% for error in field.errors %}
+                                                <span class="field__error">{{ error }}</span>
+                                            {% endfor %}
+                                        </label>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <div class="drawer-subsection">
+                            <div class="drawer-subsection__header">
+                                <h4>时间与地点</h4>
+                                <p>保存后会优先用照片里的 EXIF 自动填入；如果识别不到，你也可以手动补。</p>
+                            </div>
+                            <div class="drawer-grid drawer-grid--two">
+                                {% for field in form %}
+                                    {% if field.name == "captured_at" or field.name == "place_name" or field.name == "location_text" or field.name == "country" or field.name == "province" or field.name == "city" or field.name == "district" or field.name == "latitude" or field.name == "longitude" %}
+                                        <label class="field {% if field.name == 'location_text' %}field--url{% endif %}">
+                                            <span class="field__label">{{ field.label }}</span>
+                                            {{ field }}
+                                            {% for error in field.errors %}
+                                                <span class="field__error">{{ error }}</span>
+                                            {% endfor %}
+                                        </label>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <div class="drawer-subsection">
+                            <div class="drawer-subsection__header">
+                                <h4>记忆说明</h4>
+                                <p>景色页最重要的不是参数，而是你为什么还记得这一刻。</p>
+                            </div>
+                            {% for field in form %}
+                                {% if field.name == "why_it_matters" or field.name == "long_note" %}
+                                    <label class="field">
+                                        <span class="field__label">{{ field.label }}</span>
+                                        {{ field }}
+                                        {% for error in field.errors %}
+                                            <span class="field__error">{{ error }}</span>
+                                        {% endfor %}
+                                    </label>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    </section>
+                </div>
+                <div class="editor-drawer__footer">
+                    <a class="button button--secondary" href="{% if selected_entry %}{% url 'scenery:detail' selected_entry.pk %}{% else %}{% url 'scenery:index' %}{% endif %}">
+                        取消
+                    </a>
+                    <button class="button button--primary" type="submit">保存</button>
+                </div>
+            </form>
+        </aside>
+    </div>
+{% endif %}
+{% endblock %}

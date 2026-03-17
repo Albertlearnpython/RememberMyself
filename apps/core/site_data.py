@@ -32,10 +32,10 @@ SITE_MODULES = [
     {
         "key": "scenery",
         "title": "喜欢的景色",
-        "route_name": "core:scenery",
-        "description": "照片、地点和记忆放在一起，保存抵达过的片刻。",
-        "state": "设计中",
-        "available": False,
+        "route_name": "scenery:index",
+        "description": "手机上传照片，自动识别时间和地点，把风景和当时的心情一起保存下来。",
+        "state": "首版开发",
+        "available": True,
     },
     {
         "key": "fitness",
