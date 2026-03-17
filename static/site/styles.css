@@ -1079,9 +1079,9 @@ button {
 
 .stream-card::before {
     background:
-        radial-gradient(circle at top left, var(--stream-card-glow), transparent 40%),
-        linear-gradient(135deg, rgba(255, 255, 255, 0.14), transparent 24%, transparent 56%, rgba(255, 255, 255, 0.06));
-    opacity: 0.9;
+        radial-gradient(circle at top left, var(--stream-card-glow), transparent 34%),
+        linear-gradient(135deg, rgba(255, 255, 255, 0.08), transparent 20%, transparent 58%, rgba(255, 255, 255, 0.03));
+    opacity: 0.48;
 }
 
 .stream-card::after {
@@ -1152,9 +1152,8 @@ button {
     left: 0;
     display: grid;
     gap: 4px;
-    padding: 48px 14px 14px;
-    background: linear-gradient(180deg, rgba(8, 11, 18, 0), rgba(8, 12, 20, 0.18) 24%, rgba(7, 12, 22, 0.86) 62%, rgba(6, 10, 20, 0.94));
-    backdrop-filter: blur(8px);
+    padding: 34px 14px 14px;
+    background: linear-gradient(180deg, rgba(7, 11, 19, 0) 0%, rgba(7, 11, 19, 0.08) 26%, rgba(7, 12, 22, 0.72) 68%, rgba(6, 10, 20, 0.92) 100%);
 }
 
 .stream-card__overlay strong,
