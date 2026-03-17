@@ -24,6 +24,8 @@ DATETIME_FORMAT = "%Y:%m:%d %H:%M:%S"
 OFFSET_PATTERN = re.compile(r"^(?P<sign>[+-])(?P<hours>\d{2}):(?P<minutes>\d{2})$")
 EXIF_TAGS = ExifTags.TAGS
 GPS_TAGS = ExifTags.GPSTAGS
+EXIF_IFD = getattr(getattr(ExifTags, "IFD", None), "Exif", 34665)
+GPS_IFD = getattr(getattr(ExifTags, "IFD", None), "GPSInfo", 34853)
 
 
 def apply_uploaded_photos(entry: SceneryEntry, uploaded_files) -> dict:
@@ -193,14 +195,28 @@ def _extract_exif_payload(image: Image.Image) -> dict:
     payload = {}
     for key, value in raw_exif.items():
         name = EXIF_TAGS.get(key, str(key))
-        if name == "GPSInfo" and isinstance(value, dict):
-            gps_payload = {}
-            for gps_key, gps_value in value.items():
-                gps_payload[GPS_TAGS.get(gps_key, str(gps_key))] = _serialize_exif_value(gps_value)
-            payload[name] = gps_payload
+        if name in {"GPSInfo", "ExifOffset", "InteropOffset"}:
             continue
         payload[name] = _serialize_exif_value(value)
+
+    payload.update(_extract_ifd_payload(raw_exif, EXIF_IFD, EXIF_TAGS))
+    gps_payload = _extract_ifd_payload(raw_exif, GPS_IFD, GPS_TAGS)
+    if gps_payload:
+        payload["GPSInfo"] = gps_payload
     return payload
+
+
+def _extract_ifd_payload(raw_exif, ifd_key, tag_map):
+    try:
+        ifd_payload = raw_exif.get_ifd(ifd_key)
+    except Exception:
+        return {}
+    if not isinstance(ifd_payload, dict):
+        return {}
+    return {
+        tag_map.get(key, str(key)): _serialize_exif_value(value)
+        for key, value in ifd_payload.items()
+    }
 
 
 def _serialize_exif_value(value):
@@ -334,4 +350,3 @@ def reverse_geocode(latitude: float, longitude: float) -> dict:
         "place_name": place_name,
         "location_text": payload.get("display_name") or "",
     }
-

@@ -8,9 +8,11 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
 from django.test.utils import override_settings
 from django.urls import reverse
+from PIL import ExifTags
 from PIL import Image
 
 from apps.scenery.models import SceneryEntry, SceneryPhoto
+from apps.scenery.services import _extract_exif_payload, _parse_coordinates
 
 
 User = get_user_model()
@@ -200,3 +202,47 @@ class SceneryHomeStreamTests(TestCase):
         self.assertContains(response, reverse("scenery:photo_image", args=[first_photo.pk]))
         self.assertContains(response, reverse("scenery:photo_image", args=[second_photo.pk]))
         self.assertContains(response, "2/2")
+
+
+class SceneryExifParsingTests(TestCase):
+    def test_extract_exif_payload_reads_gps_ifd(self):
+        gps_ifd_key = getattr(getattr(ExifTags, "IFD", None), "GPSInfo", 34853)
+        exif_ifd_key = getattr(getattr(ExifTags, "IFD", None), "Exif", 34665)
+
+        class FakeExif:
+            def items(self):
+                return [
+                    (306, "2026:03:17 19:28:18"),
+                    (34853, 2740),
+                    (34665, 288),
+                ]
+
+            def get_ifd(self, key):
+                if key == gps_ifd_key:
+                    return {
+                        1: "N",
+                        2: (22.0, 32.0, 24.0),
+                        3: "E",
+                        4: (113.0, 56.0, 12.0),
+                    }
+                if key == exif_ifd_key:
+                    return {
+                        36867: "2026:03:17 19:28:18",
+                        36881: "+08:00",
+                    }
+                return {}
+
+        class FakeImage:
+            def getexif(self):
+                return FakeExif()
+
+        payload = _extract_exif_payload(FakeImage())
+
+        self.assertEqual(payload["DateTimeOriginal"], "2026:03:17 19:28:18")
+        self.assertEqual(payload["OffsetTimeOriginal"], "+08:00")
+        self.assertEqual(payload["GPSInfo"]["GPSLatitudeRef"], "N")
+        self.assertEqual(payload["GPSInfo"]["GPSLongitudeRef"], "E")
+
+        latitude, longitude = _parse_coordinates(payload)
+        self.assertAlmostEqual(latitude, 22.54, places=2)
+        self.assertAlmostEqual(longitude, 113.936667, places=5)
