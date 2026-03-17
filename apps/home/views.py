@@ -145,7 +145,7 @@ def index(request):
 def _build_memory_streams(books, tracks, scenery_entries):
     book_items = [_build_book_stream_item(book) for book in books]
     music_items = [_build_music_stream_item(track) for track in tracks]
-    scenery_items = [_build_scenery_stream_item(entry) for entry in scenery_entries]
+    scenery_items = _build_scenery_stream_items(scenery_entries)
     return [
         {
             "key": "books",
@@ -213,7 +213,7 @@ def _build_memory_streams(books, tracks, scenery_entries):
             "title": "风景流",
             "subtitle": "景色归档",
             "description": "手机拍下的那一刻，会把时间、地点和心情一起留下来。",
-            "count_label": f"{len(scenery_items)} 组" if scenery_items else "尚未入册",
+            "count_label": f"{len(scenery_items)} 张" if scenery_items else "尚未入册",
             "enter_label": "进入景色页",
             "path": reverse("scenery:index"),
             "rows": _build_stream_rows(
@@ -259,19 +259,38 @@ def _build_music_stream_item(track):
     }
 
 
-def _build_scenery_stream_item(entry):
-    meta = entry.location_summary
-    if entry.captured_at:
-        meta = f"{meta} · {timezone.localtime(entry.captured_at):%Y-%m-%d}"
-    return {
-        "id": f"scenery-{entry.pk}",
-        "kind": "scenery",
-        "title": entry.display_title,
-        "meta": meta,
-        "path": reverse("scenery:detail", args=[entry.pk]),
-        "image_url": entry.cover_image_url,
-        "fallback": (entry.display_title or "?")[:1],
-    }
+def _build_scenery_stream_items(entries):
+    items = []
+    for entry in entries:
+        cached_photos = getattr(entry, "_prefetched_objects_cache", {}).get("photos")
+        photos = list(cached_photos if cached_photos is not None else entry.photos.all())
+        if not photos:
+            continue
+
+        total = len(photos)
+        for index, photo in enumerate(photos, start=1):
+            meta_parts = []
+            if total > 1:
+                meta_parts.append(f"{index}/{total}")
+            location = entry.location_summary
+            if location:
+                meta_parts.append(location)
+            captured_at = photo.taken_at or entry.captured_at
+            if captured_at:
+                meta_parts.append(f"{timezone.localtime(captured_at):%Y-%m-%d}")
+
+            items.append(
+                {
+                    "id": f"scenery-{entry.pk}-{photo.pk}",
+                    "kind": "scenery",
+                    "title": entry.display_title,
+                    "meta": " · ".join(meta_parts) if meta_parts else "景色照片",
+                    "path": reverse("scenery:detail", args=[entry.pk]),
+                    "image_url": photo.image_url,
+                    "fallback": (entry.display_title or "?")[:1],
+                }
+            )
+    return items
 
 
 def _build_stream_rows(items, lane_count, direction, durations):

@@ -171,3 +171,32 @@ class SceneryHomeStreamTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "山顶晚霞")
 
+    def test_home_page_renders_multiple_photos_from_same_entry_in_stream(self):
+        entry = SceneryEntry.objects.create(
+            title="海边傍晚",
+            city="深圳",
+            visibility=SceneryEntry.Visibility.PUBLIC,
+        )
+        first_photo = SceneryPhoto.objects.create(
+            entry=entry,
+            image=build_test_image(name="sea-1.jpg", color=(56, 114, 168)),
+            original_filename="sea-1.jpg",
+            width=1200,
+            height=900,
+            sort_order=0,
+        )
+        second_photo = SceneryPhoto.objects.create(
+            entry=entry,
+            image=build_test_image(name="sea-2.jpg", color=(96, 144, 188)),
+            original_filename="sea-2.jpg",
+            width=1200,
+            height=900,
+            sort_order=1,
+        )
+
+        response = self.client.get(reverse("home:index"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, reverse("scenery:photo_image", args=[first_photo.pk]))
+        self.assertContains(response, reverse("scenery:photo_image", args=[second_photo.pk]))
+        self.assertContains(response, "2/2")
