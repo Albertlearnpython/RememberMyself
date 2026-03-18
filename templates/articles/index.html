@@ -1,0 +1,200 @@
+{% extends "base.html" %}
+
+{% block body_class %}page page--articles{% endblock %}
+
+{% block content %}
+<section class="articles-page">
+    <div class="articles-page__header">
+        <div>
+            <p class="section-label">文章板块</p>
+            <h1>文字档案室</h1>
+        </div>
+        <div class="articles-page__actions">
+            <form method="get" class="articles-search">
+                <input
+                    type="search"
+                    name="q"
+                    value="{{ active_filters.q }}"
+                    placeholder="搜索标题、摘要、正文或文件名"
+                >
+                {% if active_filters.visibility %}
+                    <input type="hidden" name="visibility" value="{{ active_filters.visibility }}">
+                {% endif %}
+                <button class="button button--secondary" type="submit">搜索</button>
+            </form>
+            {% if can_edit %}
+                <a class="button button--primary" href="{% url 'articles:index' %}?editor=create">新增文章</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="articles-layout">
+        <aside class="articles-filters">
+            {% if can_edit %}
+                <div class="filter-group">
+                    <p class="filter-group__title">可见性</p>
+                    <a class="filter-chip {% if not active_filters.visibility %}is-active{% endif %}" href="{% url 'articles:index' %}">
+                        全部
+                    </a>
+                    {% for value, label in visibility_filters %}
+                        <a
+                            class="filter-chip {% if active_filters.visibility == value %}is-active{% endif %}"
+                            href="{% url 'articles:index' %}?visibility={{ value }}"
+                        >
+                            {{ label }}
+                        </a>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <div class="filter-group">
+                <p class="filter-group__title">说明</p>
+                <p class="muted-copy">
+                    这里用于上传、下载、覆盖和展示 Markdown 文档。正文改动保存后，会同步写回源文件。
+                </p>
+            </div>
+        </aside>
+
+        <section class="articles-list">
+            {% if articles %}
+                {% for article in articles %}
+                    <a
+                        class="article-card {% if selected_article and selected_article.pk == article.pk %}is-selected{% endif %}"
+                        href="{% url 'articles:detail' article.pk %}{{ filter_query }}"
+                    >
+                        <div class="article-card__cover">
+                            <span>MD</span>
+                        </div>
+                        <div class="article-card__body is-copyable">
+                            <div class="article-card__meta is-copyable">
+                                <strong>{{ article.title }}</strong>
+                                <small>{{ article.download_name }}</small>
+                            </div>
+                            <div class="article-card__chips">
+                                <span class="meta-pill meta-pill--tone-2">{{ article.get_visibility_display }}</span>
+                                <span class="meta-pill meta-pill--neutral">{{ article.formatted_source_size }}</span>
+                            </div>
+                            <p class="article-card__summary is-copyable">
+                                {% if article.excerpt %}
+                                    {{ article.excerpt }}
+                                {% else %}
+                                    这篇文章已经进入文字档案室，摘要还没写下。
+                                {% endif %}
+                            </p>
+                        </div>
+                        <div class="article-card__aside">
+                            <small>{{ article.updated_at|date:"Y-m-d" }}</small>
+                            <span>查看</span>
+                        </div>
+                    </a>
+                {% endfor %}
+            {% else %}
+                <div class="empty-panel">
+                    <h2>文章档案还没有内容</h2>
+                    <p>第一版已经接好 Markdown 上传、下载、覆盖和渲染展示，现在只差第一篇文章被放进来。</p>
+                    {% if can_edit %}
+                        <a class="button button--primary" href="{% url 'articles:index' %}?editor=create">加入第一篇文章</a>
+                    {% endif %}
+                </div>
+            {% endif %}
+        </section>
+
+        <aside class="article-detail">
+            {% if selected_article %}
+                <div class="article-detail__header">
+                    <div class="is-copyable">
+                        <p class="section-label">Markdown 文章</p>
+                        <h2>{{ selected_article.title }}</h2>
+                        <p>{{ selected_article.summary|default:"这篇文章还没有单独摘要，当前展示的是完整正文。" }}</p>
+                    </div>
+                    {% if can_edit %}
+                        <a class="button button--secondary" href="{% url 'articles:detail' selected_article.pk %}?editor=edit">编辑</a>
+                    {% endif %}
+                </div>
+
+                <dl class="detail-meta">
+                    <div><dt>文件</dt><dd class="is-copyable">{{ selected_article.download_name }}</dd></div>
+                    <div><dt>大小</dt><dd class="is-copyable">{{ selected_article.formatted_source_size }}</dd></div>
+                    <div><dt>可见性</dt><dd class="is-copyable">{{ selected_article.get_visibility_display }}</dd></div>
+                    <div><dt>更新</dt><dd class="is-copyable">{{ selected_article.updated_at|date:"Y-m-d H:i" }}</dd></div>
+                </dl>
+
+                <section class="asset-panel">
+                    <div class="asset-panel__header">
+                        <div>
+                            <span class="section-label">源文件</span>
+                            <h3>Markdown 下载</h3>
+                        </div>
+                        <a class="button button--secondary" href="{% url 'articles:download_source' selected_article.pk %}">
+                            下载 .md
+                        </a>
+                    </div>
+                    <p class="muted-copy">编辑保存后，当前正文会同步覆盖源文件；再次下载时拿到的就是最新版本。</p>
+                </section>
+
+                <section class="article-render-panel">
+                    <div class="article-render-panel__header">
+                        <span class="section-label">正文展示</span>
+                        <p>当前页会直接把 Markdown 渲染成网页内容。</p>
+                    </div>
+                    <article class="article-markdown is-copyable">
+                        {{ selected_article.rendered_markdown }}
+                    </article>
+                </section>
+
+                {% if can_edit %}
+                    <form class="danger-form" method="post" action="{% url 'articles:delete' selected_article.pk %}">
+                        {% csrf_token %}
+                        <button class="button button--danger" type="submit">删除这篇文章</button>
+                    </form>
+                {% endif %}
+            {% else %}
+                <div class="empty-panel">
+                    <h2>详情区会停在这里</h2>
+                    <p>选中左侧文章卡片后，右边会显示源文件信息、下载入口和渲染后的 Markdown 正文。</p>
+                </div>
+            {% endif %}
+        </aside>
+    </div>
+</section>
+
+{% if editor_mode and form %}
+    <div class="drawer-backdrop">
+        <aside class="editor-drawer">
+            <div class="editor-drawer__header">
+                <div>
+                    <p class="section-label">编辑抽屉</p>
+                    <h2>{% if editor_mode == "edit" %}编辑文章{% else %}新增文章{% endif %}</h2>
+                </div>
+                <a class="button button--secondary" href="{% if selected_article %}{% url 'articles:detail' selected_article.pk %}{% else %}{% url 'articles:index' %}{% endif %}">关闭</a>
+            </div>
+
+            <form
+                method="post"
+                enctype="multipart/form-data"
+                class="editor-drawer__form"
+                action="{% if editor_mode == 'edit' and selected_article %}{% url 'articles:edit' selected_article.pk %}{% else %}{% url 'articles:create' %}{% endif %}"
+            >
+                {% csrf_token %}
+                <div class="editor-drawer__body">
+                    {% if form.non_field_errors %}
+                        <div class="form-errors">
+                            {% for error in form.non_field_errors %}
+                                <p>{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                    {% include "articles/partials/article_form_fields.html" %}
+                </div>
+                <div class="editor-drawer__footer">
+                    <a class="button button--secondary" href="{% if selected_article %}{% url 'articles:detail' selected_article.pk %}{% else %}{% url 'articles:index' %}{% endif %}">
+                        取消
+                    </a>
+                    <button class="button button--primary" type="submit">保存</button>
+                </div>
+            </form>
+        </aside>
+    </div>
+{% endif %}
+{% endblock %}
+

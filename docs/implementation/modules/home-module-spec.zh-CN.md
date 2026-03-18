@@ -8,7 +8,7 @@
 - 左侧个人档案卡
 - 右侧介绍主卡
 - 模块索引
-- 四条记忆溪流
+- 五条记忆溪流
 - 最近更新
 - 页尾摘录
 
@@ -47,6 +47,7 @@ HomePage
 ├─ ModuleIndexSection
 ├─ MemoryStreamsSection
 │  ├─ MemoryStreamSection (books)
+│  ├─ MemoryStreamSection (articles)
 │  ├─ MemoryStreamSection (music)
 │  ├─ MemoryStreamSection (food)
 │  └─ MemoryStreamSection (scenery)
@@ -102,9 +103,9 @@ HomePage
 
 ### `memory_streams`
 
-首页四条流带的数据源。
+首页五条流带的数据源。
 
-书影流当前接真实数据，其余三条保留占位结构。
+书影流、字句流、声纹流、风景流当前都接真实数据；食味流保留占位结构。
 
 ## 当前数据规则
 
@@ -114,7 +115,25 @@ HomePage
 - 必须按权限过滤
 - 真实书籍卡片点进书籍详情
 
-### 声纹流 / 食味流 / 风景流
+### 字句流
+
+- 数据源：`ArticleEntry.objects.visible_to_user(request.user)`
+- 必须按权限过滤
+- 真实文章卡片点进文章详情
+
+### 声纹流
+
+- 数据源：`MusicTrack.objects.visible_to_user(request.user)`
+- 必须按权限过滤
+- 真实音乐卡片点进音乐详情
+
+### 风景流
+
+- 数据源：`SceneryEntry.objects.visible_to_user(request.user)`
+- 取出每组景色中的所有照片，生成真实图片卡
+- 点击后进入景色详情
+
+### 食味流
 
 - 先保留占位卡
 - 不伪造用户真实内容
@@ -145,17 +164,19 @@ stateDiagram-v2
 - 模块卡：整卡点击
 - 流带右上角入口：进入对应模块
 - 书影流卡片：进入书籍详情
+- 字句流卡片：进入文章详情
 - hover 流带：暂停滚动
 
 ## 当前测试要求
 
 - 首页返回 `200`
-- 首页必须出现四条流带标题
+- 首页必须出现五条流带标题
 - 有书时显示真实书名
+- 有文章时显示真实文章标题
 - 无书时显示书影流空状态提示
 
 ## 当前扩展点
 
-- 音乐、美食、景色只要有真实模型，就能复用当前流带结构
+- 文章、音乐、美食、景色只要有真实模型，就能复用当前流带结构
 - 如果以后加“照片流”“方法卡流”，只需要新增一个流带配置项
 - 首页结构本身不需要推翻

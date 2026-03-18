@@ -35,6 +35,7 @@ docs/implementation/
 
 - [首页模块实现说明（中文）](./modules/home-module-spec.zh-CN.md)
 - [收藏书籍模块实现说明（中文）](./modules/books-module-spec.zh-CN.md)
+- [文章模块实现说明（中文）](./modules/articles-module-spec.zh-CN.md)
 - [喜欢的美食模块实现说明（中文）](./modules/food-module-spec.zh-CN.md)
 - [喜欢的音乐模块实现说明（中文）](./modules/music-module-spec.zh-CN.md)
 - [喜欢的景色模块实现说明（中文）](./modules/scenery-module-spec.zh-CN.md)

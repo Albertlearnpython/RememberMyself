@@ -14,6 +14,14 @@ SITE_MODULES = [
         "available": True,
     },
     {
+        "key": "articles",
+        "title": "文章",
+        "route_name": "articles:index",
+        "description": "上传和维护 Markdown 文档，把较长的思考、说明和记录留在这里。",
+        "state": "首版开发",
+        "available": True,
+    },
+    {
         "key": "food",
         "title": "喜欢的美食",
         "route_name": "core:food",

@@ -24,7 +24,7 @@
 - [首页高保真说明](./design/home/visual-spec.zh-CN.md)
 - [首页版式深化说明](./design/home/ui-composition.zh-CN.md)
 - [首页最终视觉稿说明](./design/home/final-visual-spec.zh-CN.md)
-- [首页四条流带设计稿](./design/home/memory-streams.zh-CN.md)
+- [首页五条流带设计稿](./design/home/memory-streams.zh-CN.md)
 
 ### 全站色彩系统（当前版本）
 
@@ -42,6 +42,7 @@ docs/
 │  ├─ system/
 │  ├─ home/
 │  ├─ books/
+│  ├─ articles/
 │  ├─ music/
 │  ├─ food/
 │  ├─ scenery/
@@ -65,7 +66,7 @@ docs/
 - [首页高保真说明（中文）](./design/home/visual-spec.zh-CN.md)
 - [首页版式深化说明（中文）](./design/home/ui-composition.zh-CN.md)
 - [首页最终视觉稿说明（中文）](./design/home/final-visual-spec.zh-CN.md)
-- [首页四条流带设计稿（中文）](./design/home/memory-streams.zh-CN.md)
+- [首页五条流带设计稿（中文）](./design/home/memory-streams.zh-CN.md)
 
 ### 收藏书籍
 
@@ -75,6 +76,10 @@ docs/
 - [收藏书籍交互与手机端说明（中文）](./design/books/interaction-flow.zh-CN.md)
 - [收藏书籍最终视觉稿说明（中文）](./design/books/final-visual-spec.zh-CN.md)
 - [收藏书籍外部信息补全设计（中文）](./design/books/metadata-enrichment.zh-CN.md)
+
+### 文章
+
+- [文章最终视觉稿说明（中文）](./design/articles/final-visual-spec.zh-CN.md)
 
 ### 喜欢的音乐 / 美食 / 其他板块
 
@@ -94,6 +99,7 @@ docs/
 - [状态机总规范](./implementation/system/state-machine-conventions.zh-CN.md)
 - [首页模块实现说明](./implementation/modules/home-module-spec.zh-CN.md)
 - [收藏书籍模块实现说明](./implementation/modules/books-module-spec.zh-CN.md)
+- [文章模块实现说明](./implementation/modules/articles-module-spec.zh-CN.md)
 - [喜欢的音乐模块实现说明](./implementation/modules/music-module-spec.zh-CN.md)
 
 ## 需求历史
@@ -103,9 +109,10 @@ docs/
 ## 当前确认过的关键设计决定
 
 - 首页是“安静的总索引”，不是展示型官网
-- 首页主结构已经固定为：个人档案卡 + 介绍主卡 + 模块索引 + 四条流带
+- 首页主结构已经固定为：个人档案卡 + 介绍主卡 + 模块索引 + 五条流带
 - 首页色调已经从偏黄路线切换为冷白底上的高级多彩路线
-- 四条流带已经是首页固定结构，不再是临时想法
+- 五条流带已经是首页固定结构，不再是临时想法
 - 收藏书籍模块定位已经收敛为：封面展示 + 附件归档 + 下载
+- 文章模块当前定位已经收敛为：Markdown 上传 + 下载 + 覆盖 + 渲染展示
 - 音乐模块当前只做上传、下载、展示，不做在线播放
 - 文档以后优先维护中文版本，过时口径直接更新，不继续挂旧方案

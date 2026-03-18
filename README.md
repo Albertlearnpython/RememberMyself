@@ -6,8 +6,9 @@
 
 目前已经落地：
 
-- 首页“四条记忆溪流”
+- 首页“五条记忆溪流”
 - 收藏书籍第一版
+- 文章第一版（Markdown 上传 / 下载 / 覆盖 / 展示）
 - 喜欢的音乐第一版（上传 / 下载 / 展示）
 
 ## 项目方向
@@ -51,13 +52,14 @@
 
 1. 首页
 2. 收藏书籍
-3. 喜欢的美食
-4. 喜欢的音乐
-5. 喜欢的景色
-6. 健身养体
-7. 收支平衡
-8. 时间安排
-9. 方法心得
+3. 文章
+4. 喜欢的美食
+5. 喜欢的音乐
+6. 喜欢的景色
+7. 健身养体
+8. 收支平衡
+9. 时间安排
+10. 方法心得
 
 ## 文档导航
 
@@ -74,6 +76,7 @@
 - [收藏书籍字段设计（中文）](./docs/design/books/data-fields.zh-CN.md)
 - [收藏书籍交互与手机端说明（中文）](./docs/design/books/interaction-flow.zh-CN.md)
 - [收藏书籍最终视觉稿说明（中文）](./docs/design/books/final-visual-spec.zh-CN.md)
+- [文章最终视觉稿说明（中文）](./docs/design/articles/final-visual-spec.zh-CN.md)
 - [喜欢的美食最终视觉稿说明（中文）](./docs/design/food/final-visual-spec.zh-CN.md)
 - [喜欢的音乐最终视觉稿说明（中文）](./docs/design/music/final-visual-spec.zh-CN.md)
 - [全站板块成熟度总览（中文）](./docs/design/all-modules/initial-overview.zh-CN.md)
@@ -88,6 +91,7 @@
 - [状态机总规范（中文）](./docs/implementation/system/state-machine-conventions.zh-CN.md)
 - [首页模块实现说明（中文）](./docs/implementation/modules/home-module-spec.zh-CN.md)
 - [收藏书籍模块实现说明（中文）](./docs/implementation/modules/books-module-spec.zh-CN.md)
+- [文章模块实现说明（中文）](./docs/implementation/modules/articles-module-spec.zh-CN.md)
 - [喜欢的美食模块实现说明（中文）](./docs/implementation/modules/food-module-spec.zh-CN.md)
 - [喜欢的音乐模块实现说明（中文）](./docs/implementation/modules/music-module-spec.zh-CN.md)
 - [喜欢的景色模块实现说明（中文）](./docs/implementation/modules/scenery-module-spec.zh-CN.md)
@@ -116,8 +120,9 @@
 ## 当前状态
 
 - 已完成：总体架构规划与中文优先文档整理
-- 已完成：首页“四条记忆溪流”第一版
+- 已完成：首页“五条记忆溪流”第一版
 - 已完成：收藏书籍第一版
+- 已完成：文章第一版数据模型、Markdown 上传下载、覆盖与详情渲染
 - 已完成：喜欢的音乐第一版数据模型、上传下载和详情页
 - 已完成：首页 `声纹流` 接入真实音乐数据
 - 已完成：全站色彩系统切换的第一轮施工

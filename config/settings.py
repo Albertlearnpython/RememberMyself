@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'apps.core',
     'apps.home',
     'apps.books',
+    'apps.articles',
     'apps.music',
     'apps.scenery',
 ]

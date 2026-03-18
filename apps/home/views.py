@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django.urls import reverse
 from django.utils import timezone
 
+from apps.articles.models import ArticleEntry
 from apps.books.models import Book
 from apps.core.site_data import SITE_TAGLINE, get_site_modules
 from apps.music.models import MusicTrack
@@ -40,9 +41,11 @@ HOME_TIMELINE = [
 
 def index(request):
     modules = get_site_modules()
+    visible_articles = list(ArticleEntry.objects.visible_to_user(request.user))
     visible_books = list(Book.objects.visible_to_user(request.user))
     visible_tracks = list(MusicTrack.objects.visible_to_user(request.user))
     visible_scenery = list(SceneryEntry.objects.visible_to_user(request.user).prefetch_related("photos"))
+    latest_article = visible_articles[0] if visible_articles else None
     latest_book = visible_books[0] if visible_books else None
     latest_track = visible_tracks[0] if visible_tracks else None
     latest_scenery = visible_scenery[0] if visible_scenery else None
@@ -54,7 +57,7 @@ def index(request):
         "title": "我把真正留下来的东西，放在这里，让它们缓慢流过。",
         "body": (
             "这里不是展示型官网，而是一份仍在生长的个人档案册入口。"
-            " 书、声音、食物和风景不急着解释自己，只先在首页安静出现。"
+            " 书、文字、声音、食物和风景不急着解释自己，只先在首页安静出现。"
         ),
         "primary_action": {"label": "进入藏书室", "path": reverse("books:index")},
         "secondary_action": {"label": "看记忆溪流", "path": "/#memory-streams"},
@@ -77,9 +80,26 @@ def index(request):
         },
     ]
 
-    memory_streams = _build_memory_streams(visible_books, visible_tracks, visible_scenery)
+    memory_streams = _build_memory_streams(
+        visible_books,
+        visible_articles,
+        visible_tracks,
+        visible_scenery,
+    )
 
     recent_updates = [
+        {
+            "module": "文章",
+            "summary": f"最近加入《{latest_article.title}》。"
+            if latest_article
+            else "文章模块已接入 Markdown 上传、下载、覆盖和首页字句流。",
+            "time": latest_article.updated_at.strftime("%Y-%m-%d")
+            if latest_article
+            else "第一版",
+            "path": reverse("articles:detail", args=[latest_article.pk])
+            if latest_article
+            else reverse("articles:index"),
+        },
         {
             "module": "收藏书籍",
             "summary": f"最近整理到《{latest_book.title}》。"
@@ -142,8 +162,9 @@ def index(request):
     return render(request, "home/index.html", context)
 
 
-def _build_memory_streams(books, tracks, scenery_entries):
+def _build_memory_streams(books, articles, tracks, scenery_entries):
     book_items = [_build_book_stream_item(book) for book in books]
+    article_items = [_build_article_stream_item(article) for article in articles]
     music_items = [_build_music_stream_item(track) for track in tracks]
     scenery_items = _build_scenery_stream_items(scenery_entries)
     return [
@@ -163,6 +184,31 @@ def _build_memory_streams(books, tracks, scenery_entries):
                 durations=(78, 92),
             ),
             "empty_note": None if book_items else "第一本书录入后，书影流会从这里开始缓慢流动。",
+        },
+        {
+            "key": "articles",
+            "tone": "articles",
+            "title": "字句流",
+            "subtitle": "Markdown 文章",
+            "description": "较长的文字、说明和想法，以正文的方式在这里慢慢流过。",
+            "count_label": f"{len(article_items)} 篇" if article_items else "尚未入册",
+            "enter_label": "进入文章页",
+            "path": reverse("articles:index"),
+            "rows": _build_stream_rows(
+                article_items,
+                lane_count=2,
+                direction="right",
+                durations=(88, 76),
+            )
+            if article_items
+            else _build_placeholder_rows(
+                kind="articles",
+                lane_count=2,
+                direction="right",
+                durations=(88, 76),
+                item_count=10,
+            ),
+            "empty_note": None if article_items else "第一篇文章录入后，字句流会把 Markdown 文档带进首页。",
         },
         {
             "key": "music",
@@ -244,6 +290,18 @@ def _build_book_stream_item(book):
         "path": reverse("books:detail", args=[book.pk]),
         "image_url": book.cover_image_url,
         "fallback": (book.title or "?")[:1],
+    }
+
+
+def _build_article_stream_item(article):
+    return {
+        "id": f"article-{article.pk}",
+        "kind": "article",
+        "title": article.title,
+        "meta": article.summary or article.download_name,
+        "path": reverse("articles:detail", args=[article.pk]),
+        "image_url": "",
+        "fallback": article.fallback_label,
     }
 
 

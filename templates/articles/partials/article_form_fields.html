@@ -1,0 +1,64 @@
+<section class="drawer-section drawer-section--form">
+    <div class="drawer-subsection">
+        <div class="drawer-subsection__header">
+            <h4>源文件与基础信息</h4>
+            <p>可以直接上传 `.md` 文件，也可以先填标题和正文后保存。上传新文件时，会用文件内容覆盖正文。</p>
+        </div>
+
+        <div class="drawer-grid drawer-grid--two">
+            <label class="field">
+                <span class="field__label">{{ form.title.label }}</span>
+                {{ form.title }}
+                {% for error in form.title.errors %}
+                    <span class="field__error">{{ error }}</span>
+                {% endfor %}
+            </label>
+
+            <label class="field">
+                <span class="field__label">{{ form.visibility.label }}</span>
+                {{ form.visibility }}
+                {% for error in form.visibility.errors %}
+                    <span class="field__error">{{ error }}</span>
+                {% endfor %}
+            </label>
+        </div>
+
+        <label class="field">
+            <span class="field__label">{{ form.summary.label }}</span>
+            {{ form.summary }}
+            <span class="field__hint">摘要会同时用于左侧列表卡片和首页“字句流”。</span>
+            {% for error in form.summary.errors %}
+                <span class="field__error">{{ error }}</span>
+            {% endfor %}
+        </label>
+
+        <label class="field">
+            <span class="field__label">{{ form.source_upload.label }}</span>
+            {{ form.source_upload }}
+            {% if selected_article %}
+                <span class="field__hint">当前源文件：{{ selected_article.download_name }}</span>
+            {% else %}
+                <span class="field__hint">支持 `.md / .markdown / .txt`，建议使用 UTF-8。</span>
+            {% endif %}
+            {% for error in form.source_upload.errors %}
+                <span class="field__error">{{ error }}</span>
+            {% endfor %}
+        </label>
+    </div>
+
+    <div class="drawer-subsection">
+        <div class="drawer-subsection__header">
+            <h4>Markdown 正文</h4>
+            <p>这里的正文就是最终展示内容。你在这里修改后，保存时会同步覆盖服务器上的源文件。</p>
+        </div>
+
+        <label class="field field--markdown">
+            <span class="field__label">{{ form.markdown_content.label }}</span>
+            {{ form.markdown_content }}
+            <span class="field__hint">支持标题、列表、引用、代码块、表格等常见 Markdown 语法。</span>
+            {% for error in form.markdown_content.errors %}
+                <span class="field__error">{{ error }}</span>
+            {% endfor %}
+        </label>
+    </div>
+</section>
