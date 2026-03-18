@@ -3,7 +3,7 @@ from django.db import transaction
 from django.utils import timezone
 
 from apps.scenery.models import SceneryEntry
-from apps.scenery.services import apply_uploaded_photos
+from apps.scenery.services import apply_uploaded_photos, sync_entry_metadata
 
 
 class MultipleFileInput(forms.ClearableFileInput):
@@ -91,6 +91,7 @@ class SceneryEditorForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self._initial_coordinates = (self.instance.latitude, self.instance.longitude)
         if self.instance.pk and self.instance.captured_at:
             self.initial["captured_at"] = timezone.localtime(self.instance.captured_at).strftime(
                 "%Y-%m-%dT%H:%M"
@@ -115,6 +116,16 @@ class SceneryEditorForm(forms.ModelForm):
         uploads = self.cleaned_data.get("photos") or []
         with transaction.atomic():
             entry.save()
-            self.upload_summary = apply_uploaded_photos(entry, uploads)
+            if uploads:
+                self.upload_summary = apply_uploaded_photos(entry, uploads)
+            elif self._coordinates_changed(entry):
+                self.upload_summary = sync_entry_metadata(entry)
+            else:
+                self.upload_summary = {}
         return entry
 
+    def _coordinates_changed(self, entry):
+        return (
+            self._initial_coordinates[0] != entry.latitude
+            or self._initial_coordinates[1] != entry.longitude
+        )

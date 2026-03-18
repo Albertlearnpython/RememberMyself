@@ -145,6 +145,85 @@ class SceneryUploadTests(TestCase):
         self.assertContains(response, "至少上传一张图片")
         self.assertFalse(SceneryEntry.objects.filter(title="空景色").exists())
 
+    @patch("apps.scenery.forms.sync_entry_metadata")
+    def test_edit_without_new_upload_or_coordinate_change_skips_resync(self, sync_entry_metadata):
+        self.client.login(username="scenery_asset_admin", password="pass123456")
+        entry = SceneryEntry.objects.create(
+            title="旧景色",
+            short_note="原说明",
+            visibility=SceneryEntry.Visibility.PUBLIC,
+            latitude="23.379478",
+            longitude="113.196847",
+        )
+        SceneryPhoto.objects.create(
+            entry=entry,
+            image=build_test_image(),
+            original_filename="old.jpg",
+            width=1200,
+            height=900,
+        )
+
+        response = self.client.post(
+            reverse("scenery:edit", args=[entry.pk]),
+            data={
+                "title": "旧景色",
+                "short_note": "改一句话",
+                "why_it_matters": "",
+                "long_note": "",
+                "captured_at": "",
+                "place_name": "",
+                "location_text": "",
+                "country": "",
+                "province": "",
+                "city": "",
+                "district": "",
+                "latitude": "23.379478",
+                "longitude": "113.196847",
+                "visibility": SceneryEntry.Visibility.PUBLIC,
+            },
+        )
+
+        self.assertEqual(response.status_code, 302)
+        sync_entry_metadata.assert_not_called()
+
+    @patch("apps.scenery.forms.sync_entry_metadata")
+    def test_edit_with_coordinate_change_triggers_resync(self, sync_entry_metadata):
+        self.client.login(username="scenery_asset_admin", password="pass123456")
+        entry = SceneryEntry.objects.create(
+            title="旧景色",
+            visibility=SceneryEntry.Visibility.PUBLIC,
+        )
+        SceneryPhoto.objects.create(
+            entry=entry,
+            image=build_test_image(),
+            original_filename="old.jpg",
+            width=1200,
+            height=900,
+        )
+
+        response = self.client.post(
+            reverse("scenery:edit", args=[entry.pk]),
+            data={
+                "title": "旧景色",
+                "short_note": "",
+                "why_it_matters": "",
+                "long_note": "",
+                "captured_at": "",
+                "place_name": "",
+                "location_text": "",
+                "country": "",
+                "province": "",
+                "city": "",
+                "district": "",
+                "latitude": "23.379478",
+                "longitude": "113.196847",
+                "visibility": SceneryEntry.Visibility.PUBLIC,
+            },
+        )
+
+        self.assertEqual(response.status_code, 302)
+        sync_entry_metadata.assert_called_once()
+
 
 class SceneryHomeStreamTests(TestCase):
     def setUp(self):
